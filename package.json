@@ -1,0 +1,8 @@
+{
+  "name": "georadar-langdock-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interaktive Deutschland-Österreich-Karte als MCP App für Langdock",
+  "engines": { "node": ">=22" },
+  "scripts": { "start": "node server.cjs" }
+}

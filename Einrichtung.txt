@@ -1,0 +1,37 @@
+GeoRadar für Langdock – wiederverwendbare MCP App
+
+Stand: 28.10.2026. Lokaler Prototyp; noch nicht in deinem Langdock-Konto installiert.
+
+Das Paket enthält eine dauerhaft wiederverwendbare Deutschland-Österreich-Karte und das Werkzeug show_georadar_map. Bei jedem Aufruf werden neue Ergebnisdaten angezeigt. Es werden keine Kunden zwischen Nutzern oder Aufrufen serverseitig gespeichert. Bestehende LeadRadar-Ergebnisse werden nicht automatisch aus anderen Chats abgerufen.
+
+Start / Hosting
+1. Node.js 22 oder neuer installieren. Keine weiteren Pakete erforderlich.
+2. Lokal mit node server.cjs starten (nur 127.0.0.1:8787).
+3. Für Langdock auf einem freigegebenen HTTPS-Server betreiben. HOST=0.0.0.0, PORT nach Hostingvorgabe und GEORADAR_TOKEN als zufälliges Geheimnis mit mindestens 32 Zeichen konfigurieren. TLS am Reverse Proxy/Hosting aktivieren. Keine API-Schlüssel im Agentenprompt oder Kartencode hinterlegen.
+4. /health ist der Gesundheitscheck. /mcp ist der stateless Streamable-HTTP-Endpunkt (JSON-Antworten, kein SSE-Dauerkanal).
+
+In Langdock
+1. Integrationen öffnen, Integration hinzufügen, Remote-MCP verbinden.
+2. Die echte HTTPS-Adresse des Servers mit /mcp eintragen.
+3. API-Key-Authentifizierung wählen, Header Authorization: Bearer; nur den Token im dafür vorgesehenen Geheimnisfeld eintragen.
+4. List Server Features ausführen. show_georadar_map und die Kartenressource auswählen und speichern.
+5. Die Integration als Aktion im GeoRadar-Agenten hinterlegen.
+6. Falls LeadRadar separat läuft, seine Ergebnisse im selben Ablauf bereitstellen, z.B. als von GeoRadar aufgerufenen Unteragenten oder über einen Langdock-Workflow. Dies ist in diesem Paket nicht automatisch konfiguriert.
+7. Mit Testdaten prüfen: Karte öffnet sich, Land-/Regionfilter funktionieren, Marker zeigen die richtigen Firmen. Die MCP-App-Anzeige muss im verwendeten Langdock-Arbeitsbereich verfügbar sein. Der echte Langdock-End-to-End-Test steht noch aus.
+
+Agentenanweisung zum Übernehmen
+Wenn der Nutzer LeadRadar-Ergebnisse geografisch sehen möchte, sammle die aktuellen potenziellen Neukunden und den bekannten Bestandskundenbestand des betrachteten Gebiets. Rufe show_georadar_map mit records auf. Erzeuge keine neue Karte als Quelltext. Die Kategorien lauten Bestandskunde und Neukunde; Neukunde bezeichnet einen potenziellen Kunden. Nutze nachweisbare Ortskoordinaten und kennzeichne Ortszentren als ungefähre Position. Erfinde keine Firmen, Kundenbeziehungen oder Koordinaten. Fehlen Koordinaten, lass diese Datensätze aus der Karte heraus und nenne ihre Anzahl. Übergib stabile, eindeutige IDs. Fehlen Bestandskundendaten, nenne White-Spots nur Kandidaten. Andere Chats sind ohne explizite Verbindung keine Datenquelle. Weise darauf hin, wenn die Datengrundlage unvollständig ist.
+
+Datenformat
+Siehe beispiel.json. country exakt Deutschland oder Österreich; state ein offizieller Bundeslandname. maximal 2.000 Datensätze pro Aufruf. Alle Datensätze eines Aufrufs ersetzen die vorherige Ansicht; sie werden nicht angehängt. Ein leerer records-Array zeigt eine leere Karte, keine Testdaten.
+
+White-Spots
+Auf Bundeslandebene: mindestens ein gelieferter potenzieller Neukunde und kein gelieferter Bestandskunde. Dies sind Kandidaten auf Basis des übergebenen Datensatzes. Kein umfassendes Marktpotenzialmodell, keine PLZ- oder Radiusanalyse. Kategorie-Filter ändern die Berechnungsgrundlage nicht.
+
+Prüfstand
+Kartenanzeige und Import mit Browserautomatisierung lokal geprüft. Die Freigabe der Integration, Hosting, Tokenverwaltung und die Verbindung zwischen deinen konkreten Agenten sind noch einzurichten. Es wurde nichts öffentlich veröffentlicht.
+
+Primärquellen
+https://docs.langdock.com/en/using-langdock/guides/integrations/mcp/mcp
+https://developers.openai.com/plugins/build/chatgpt-ui (offener MCP-Apps-Mechanismus)
+Karten: https://github.com/isellsoap/deutschlandGeoJSON (Unlicense); https://github.com/ginseng666/GeoJSON-TopoJSON-Austria (Flooh Perlot / Statistik Austria, CC BY 4.0, Grenzen 2021). Darstellung vereinfacht aus vorhandenen Projektdateien. D3 v7.9.0, ISC-Lizenz; Copyright-Hinweis im eingebetteten Quellcode.

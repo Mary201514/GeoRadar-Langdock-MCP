@@ -1,0 +1,63 @@
+'use strict';
+(() => {
+  const D=window.GeoRadarData,$=id=>document.getElementById(id);
+  let records=[],warnings=[],filtered=[],map,page=0,popup;
+  const section=document.querySelector('.empty-state');
+  section.outerHTML='<div class="company-actions"><button id="company-import" class="outline">JSON-Daten übernehmen ↑</button><button id="company-export" class="subtle">Unternehmen exportieren ↓</button><button id="company-clear" class="subtle">Daten entfernen</button></div><div id="company-summary" class="micro" role="status">Keine Unternehmensdaten geladen.</div><div class="company-filters"><input id="company-search" type="search" aria-label="Unternehmen durchsuchen" placeholder="Firma, Ort oder PLZ …"><select id="company-status" aria-label="Kundenstatus"><option value="all">Alle Status</option><option value="existing">Bestandskunden</option><option value="prospect">Potenzielle Neukunden</option><option value="priority">Besonders interessant</option><option value="unknown">Status ungeklärt</option></select></div><div id="company-counts" class="company-counts"></div><div id="company-list" class="company-list"></div><div class="company-paging"><button id="company-prev" class="subtle">← Zurück</button><span id="company-page" class="micro"></span><button id="company-next" class="subtle">Weiter →</button></div><details id="company-warnings"><summary>Hinweise zur Standortqualität</summary><div id="company-warning-list"></div></details>';
+  document.querySelector('.empty-count').id='company-total';
+  const importDialog=document.createElement('dialog');importDialog.id='company-import-dialog';
+  importDialog.innerHTML='<div class="dialog-top"><h2>Unternehmensdaten übernehmen</h2><button class="icon-button" id="company-import-close" aria-label="Import schließen">×</button></div><p>JSON-Datei auswählen oder Daten einfügen. Jede Übergabe ersetzt den bisherigen Bestand vollständig. Die Verarbeitung bleibt im Browser; keine automatische Speicherung oder Geocodierung.</p><label class="field-label" for="company-file">JSON-Datei (maximal 5 MB)</label><input id="company-file" type="file" accept="application/json,.json"><label class="field-label" for="company-json">JSON mit records-Liste</label><textarea id="company-json" rows="12" spellcheck="false" placeholder=\'{"schema":"mangold-georadar/companies/v1","records":[]}\'></textarea><p class="micro">id, name und country sind Pflicht. status: existing, prospect, priority oder unknown. lon/lat sind optional. Exakte Positionen nur mit geprüftem Nachweis als locationAccuracy: exact kennzeichnen.</p><pre id="company-import-feedback" role="status"></pre><button id="company-apply" class="outline">Daten prüfen und übernehmen</button>';
+  document.body.append(importDialog);
+  const importButton=$('company-import');importButton.onclick=()=>{ $('company-import-feedback').textContent='';importDialog.showModal();};
+  $('company-import-close').onclick=()=>importDialog.close();
+  $('company-file').onchange=async e=>{const f=e.target.files[0];if(!f)return;if(f.size>5*1024*1024){$('company-import-feedback').textContent='Datei ist größer als 5 MB.';e.target.value='';return;}$('company-json').value=await f.text();$('company-import-feedback').textContent='Datei eingelesen. Bitte prüfen und übernehmen.';};
+  $('company-apply').onclick=()=>{try{const text=$('company-json').value;if(new Blob([text]).size>5*1024*1024)throw Error('Maximal 5 MB pro Übergabe.');accept(JSON.parse(text),'JSON-Import');importDialog.close();$('company-json').value='';$('company-file').value='';}catch(e){$('company-import-feedback').textContent='Nicht übernommen. Der bisherige Bestand bleibt erhalten.\n'+e.message;}};
+  function download(name,data){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  $('company-export').onclick=()=>download('Mangold-GeoRadar-Unternehmen.json',window.GeoRadarCompanies.getSnapshot());
+  $('company-clear').onclick=()=>accept({records:[]},'Bestand entfernt');
+  for(const id of ['company-search','company-status'])$(id).addEventListener(id==='company-search'?'input':'change',()=>{page=0;render();});
+  $('country').addEventListener('change',()=>{page=0;render();});
+  document.querySelectorAll('[data-area]').forEach(b=>b.addEventListener('click',()=>{page=0;render();}));
+  $('reset').addEventListener('click',()=>{page=0;render();});
+  $('company-prev').onclick=()=>{page--;render();};$('company-next').onclick=()=>{page++;render();};
+  const layer=document.createElement('label');layer.innerHTML='<span>Unternehmensstandorte<small>Gruppierte Marker · Statusfarben</small></span><input type="checkbox" id="company-layer" checked>'; $('layer-controls').append(layer);
+  $('company-layer').onchange=()=>{if(!map)return;for(const id of ['company-clusters','company-cluster-count','company-points'])map.setLayoutProperty(id,'visibility',$('company-layer').checked?'visible':'none');};
+  function accept(payload,source){const data=D.validate(payload);records=data.records;warnings=data.warnings;if(data.territories)window.GeoRadarTerritories?.setConfiguration(data.territories);page=0;if(popup)popup.remove();render();$('company-summary').textContent=source+': '+records.length+' Unternehmen übernommen. Jede Übergabe ersetzt den Bestand.';$('footer-data-count').textContent=records.length+' Unternehmen';document.dispatchEvent(new CustomEvent('georadar:companies-updated',{detail:D.summarize(records)}));}
+  function render(){
+    if(popup)popup.remove();
+    const area=$('country').value,status=$('company-status').value,q=$('company-search').value.trim().toLocaleLowerCase('de');
+    filtered=records.filter(r=>(area==='both'||r.country===(area==='de'?'Deutschland':'Österreich'))&&(status==='all'||r.status===status)&&(!q||[r.name,r.city,r.postalCode,r.industry].some(v=>String(v||'').toLocaleLowerCase('de').includes(q)))&&(!window.GeoRadarTerritories||window.GeoRadarTerritories.matches(r)));
+    const count=D.summarize(filtered);$('company-total').textContent=records.length;
+    $('company-counts').replaceChildren();for(const [key,item]of Object.entries(D.statuses)){const span=document.createElement('span'),dot=document.createElement('i');dot.className='dot';dot.style.background=item.color;span.append(dot,document.createTextNode(item.label+': '+count[key]));$('company-counts').append(span);}
+    const maxPage=Math.max(0,Math.ceil(filtered.length/30)-1);page=Math.max(0,Math.min(page,maxPage));
+    const list=$('company-list');list.replaceChildren();
+    for(const r of filtered.slice(page*30,page*30+30)){const b=document.createElement('button'),title=document.createElement('b'),sub=document.createElement('small');title.textContent=r.name;sub.textContent=[r.postalCode,r.city,r.country].filter(Boolean).join(' · ')+(Number.isFinite(r.lon)?'':' · ohne Kartenposition');b.append(title,sub);b.onclick=()=>show(r);list.append(b);}
+    if(!filtered.length){const p=document.createElement('p');p.textContent=records.length?'Keine Unternehmen für diese Filter.':'Noch keine Unternehmensdaten. JSON importieren oder Daten aus einer MCP-App-Übergabe empfangen.';list.append(p);}
+    $('company-page').textContent=filtered.length?(page+1)+' / '+(maxPage+1):'0 / 0';$('company-prev').disabled=page===0;$('company-next').disabled=page>=maxPage;
+    $('company-warning-list').replaceChildren();const intro=document.createElement('p');intro.textContent=count.located+' von '+count.total+' gefilterten Unternehmen mit Koordinaten. '+count.unlocated+' ohne Marker. Ungeprüfte Positionen werden nicht als exakte Firmenstandorte ausgegeben.';$('company-warning-list').append(intro);
+    for(const message of warnings.slice(0,40)){const p=document.createElement('p');p.textContent=message;$('company-warning-list').append(p);}if(warnings.length>40){const p=document.createElement('p');p.textContent='Weitere Hinweise: '+(warnings.length-40);$('company-warning-list').append(p);}
+    if(map?.getSource('companies'))map.getSource('companies').setData({type:'FeatureCollection',features:filtered.filter(r=>Number.isFinite(r.lon)).map(r=>({type:'Feature',geometry:{type:'Point',coordinates:[r.lon,r.lat]},properties:{id:r.id,status:r.status,locationAccuracy:r.locationAccuracy}}))});
+  }
+  function show(r){
+    const content=document.createElement('div'),title=document.createElement('h3');title.textContent=r.name;content.append(title);
+    const info={Status:D.statuses[r.status].label,Standort:[r.street,r.postalCode,r.city,r.state,r.country].filter(Boolean).join(', '),Branche:r.industry,'Lead-Score':r.leadScore,Umsatz:r.revenue===undefined?undefined:new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(r.revenue),Potenzial:r.potential,Produktinteressen:r.product,Verflechtungen:r.relationships,Bemerkungen:r.notes,Koordinatenquelle:r.coordinateSource,Positionsgenauigkeit:!Number.isFinite(r.lon)?'Keine Koordinaten':({exact:'Als exakt übergeben · Quellenprüfung durch Datenlieferant',approximate:'Ungefähre Position, kein exakter Firmenstandort',unknown:'Genauigkeit ungeprüft, kein bestätigter Firmenstandort'})[r.locationAccuracy]};
+    for(const [label,value]of Object.entries(info)){if(value===undefined||value==='')continue;const p=document.createElement('p'),b=document.createElement('b');b.textContent=label+': ';p.append(b,document.createTextNode(String(value)));content.append(p);}
+    if(map&&Number.isFinite(r.lon)){if(popup)popup.remove();map.flyTo({center:[r.lon,r.lat],zoom:Math.max(map.getZoom(),11),duration:window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:700});popup=new maplibregl.Popup({maxWidth:'340px'}).setLngLat([r.lon,r.lat]).setDOMContent(content).addTo(map);}
+    else{const d=document.createElement('dialog'),close=document.createElement('button');close.className='outline';close.textContent='Schließen';close.onclick=()=>{d.close();d.remove();};d.append(content,close);document.body.append(d);d.showModal();}
+  }
+  document.addEventListener('georadar:map-ready',event=>{
+    map=event.detail;
+    map.addSource('companies',{type:'geojson',data:{type:'FeatureCollection',features:[]},cluster:true,clusterMaxZoom:13,clusterRadius:45});
+    map.addLayer({id:'company-clusters',type:'circle',source:'companies',filter:['has','point_count'],paint:{'circle-color':'#324b61','circle-radius':['step',['get','point_count'],18,50,23,500,29],'circle-stroke-color':'#d3e4ef','circle-stroke-width':2}});
+    map.addLayer({id:'company-cluster-count',type:'symbol',source:'companies',filter:['has','point_count'],layout:{'text-field':['get','point_count_abbreviated'],'text-font':['Noto Sans Bold'],'text-size':12},paint:{'text-color':'#ffffff'}});
+    map.addLayer({id:'company-points',type:'circle',source:'companies',filter:['!', ['has','point_count']],paint:{'circle-color':['match',['get','status'],'existing','#2387ec','prospect','#ffffff','priority','#e0444e','#788592'],'circle-radius':8,'circle-stroke-width':['case',['==',['get','locationAccuracy'],'exact'],2,3],'circle-stroke-color':['case',['==',['get','locationAccuracy'],'exact'],'#18384e','#b6c4ce']}});
+    map.on('click','company-clusters',async e=>{const f=e.features[0];try{const zoom=await map.getSource('companies').getClusterExpansionZoom(f.properties.cluster_id);map.easeTo({center:f.geometry.coordinates,zoom,duration:500});}catch{}});
+    map.on('click','company-points',e=>{const r=records.find(r=>r.id===e.features[0].properties.id);if(r)show(r);});
+    for(const id of ['company-points','company-clusters']){map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');}
+    render();
+  });
+  document.addEventListener('georadar:tool-result',e=>{try{if(e.detail?.isError)throw Error('Der MCP-Aufruf meldet einen Fehler. Der bisherige Bestand bleibt erhalten.');if(!e.detail?.structuredContent)throw Error('Keine strukturierten Unternehmensdaten empfangen.');accept(e.detail.structuredContent,'MCP-Datenübergabe');$('bridge-state').textContent='MCP · '+records.length+' Unternehmen empfangen';}catch(error){$('bridge-state').textContent='MCP-Daten nicht übernommen: '+error.message;}});
+  document.addEventListener('georadar:territories-changed',()=>{page=0;render();});
+  window.GeoRadarCompanies={getSnapshot:()=>({schema:'mangold-georadar/companies/v1',records:records.map(r=>({...r})),...(window.GeoRadarTerritories?{territories:window.GeoRadarTerritories.getConfiguration()}: {})})};
+  render();
+})();

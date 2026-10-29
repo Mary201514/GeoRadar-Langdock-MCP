@@ -89,3 +89,6 @@ check.cjs prüft Status, Legacy-Daten, fehlende/ungültige Koordinaten, PLZ, IDs
 - Langdock: https://docs.langdock.com/en/using-langdock/guides/integrations/mcp/mcp
 
 Karten sind zoomabhängig generalisiert, keine amtliche Vermessung. Browser benötigt Internet und sendet IP/Kachelanfragen an OpenFreeMap. Firmendaten werden nicht an den Tile-Anbieter übermittelt. Keine automatische Marktpotenzial-/White-Spot-Bewertung. Stand: 29.10.2026.
+
+
+Darstellung der Nachbarländer: blasse Kontextmaske in Übersichtszooms auf Basis vorhandener echter Länder-/Bundesland-Geometrien. Bei Detailzoom blendet sie aus. Quellen und Bearbeitung: dist/licenses/context-mask-SOURCES.txt. OSM-Grenzlinien und Unternehmensmarker bleiben erhalten.

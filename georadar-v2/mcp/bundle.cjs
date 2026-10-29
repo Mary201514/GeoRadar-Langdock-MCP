@@ -5,7 +5,7 @@ function bundle(){
   let html=fs.readFileSync(path.join(dist,'index.html'),'utf8');
   for(const name of ['maplibre-gl.css','style.css'])html=html.replace('<link rel="stylesheet" href="'+name+'">',()=>'<style>'+fs.readFileSync(path.join(dist,name),'utf8').replace(/<\/style/gi,'<\\/style')+'</style>');
   const scripts=[];
-  for(const name of ['maplibre-gl.js','data-model.js','companies.js','territories.js','mcp-bridge.js','app.js']){
+  for(const name of ['maplibre-gl.js','context-mask.js','data-model.js','companies.js','territories.js','mcp-bridge.js','app.js']){
     html=html.replace('<script defer src="'+name+'"></script>','');
     scripts.push('<script>'+fs.readFileSync(path.join(dist,name),'utf8').replace(/<\/script/gi,'<\\/script')+'</script>');
   }

@@ -1,0 +1,9 @@
+Visual context mask (context-mask.js)
+
+Derived from the existing local geographic reference files:
+- Germany: isellsoap/deutschlandGeoJSON, Unlicense. https://github.com/isellsoap/deutschlandGeoJSON
+- Austria: Flooh Perlot / Statistik Austria, administrative boundaries 2021, CC BY 4.0. https://github.com/ginseng666/GeoJSON-TopoJSON-Austria
+  License: https://creativecommons.org/licenses/by/4.0/
+
+Modifications: geographic state features dissolved; exterior computed for a pale context overlay. This mask only changes visual emphasis in overview zooms. It draws no replacement boundary lines. Generalized geometries are not survey data; the overlay fades out at detailed zooms to preserve the original OSM detail near borders.
+Geometry processing: polygon-clipping 0.15.7 (MIT), used only as a local build tool. https://github.com/mfogel/polygon-clipping

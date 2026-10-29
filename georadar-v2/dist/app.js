@@ -119,6 +119,10 @@
     const district=JSON.parse(JSON.stringify(base));district.id='mangold-districts';district.minzoom=8;district.filter=['all',['==',['get','admin_level'],6],['!=',['get','maritime'],1],['!=',['get','disputed'],1]];district.layout={visibility:'none'};district.paint={'line-color':'#6a8ba2','line-width':.8,'line-dasharray':[3,2]};
     style.layers.splice(style.layers.findIndex(l=>l.id==='boundary_2'),0,district);groups.districts.push(district.id);
     style.sources.openmaptiles.attribution='<a href="https://openfreemap.org/" target="_blank">OpenFreeMap</a> · <a href="https://openmaptiles.org/" target="_blank">© OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap</a>';
+    if(window.GEORADAR_CONTEXT_MASK){
+      style.sources['mangold-context']={type:'geojson',data:window.GEORADAR_CONTEXT_MASK,attribution:'Kontextmaske: DeutschlandGeoJSON / Flooh Perlot, Statistik Austria (CC BY 4.0)'};
+      style.layers.push({id:'mangold-context-fade',type:'fill',source:'mangold-context',paint:{'fill-color':'#e5edf2','fill-opacity':['interpolate',['linear'],['zoom'],2,.48,7,.48,11,0],'fill-antialias':true}});
+    }
     return style;
   }
   async function initialize(){

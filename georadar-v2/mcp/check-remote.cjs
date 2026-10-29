@@ -1,7 +1,8 @@
 // Credentials are accepted via hidden stdin only. No secret is printed or persisted.
 'use strict';
 const assert=require('node:assert/strict');
-async function readInput(){process.stdin.setEncoding('utf8');if(process.stdin.isTTY)process.stdin.setRawMode(true);process.stdout.write('Ready for private test configuration on stdin (hidden).\n');return new Promise(resolve=>{let value='';process.stdin.on('data',part=>{value+=part;if(value.includes('\n')){if(process.stdin.isTTY)process.stdin.setRawMode(false);process.stdin.pause();resolve(JSON.parse(value.trim()));}});});}
+async function readInput(){process.stdin.setEncoding('utf8');if(process.stdin.isTTY)process.stdin.setRawMode(true);process.stdout.write('Ready for private test configuration on stdin (hidden).\n');return new Promise(resolve=>{let value='';process.stdin.on('data',part=>{if(part.includes('\u0003'))process.exit(130);value+=part;if(/[\r\n]/.test(value)){if(process.stdin.isTTY)process.stdin.setRawMode(false);process.stdin.pause();resolve(JSON.parse(value.trim()));}});});}
+let currentCheck='deployment access';
 async function main(){
   const config=await readInput(),base=new URL(config.url);assert.equal(base.protocol,'https:');assert(base.hostname.endsWith('.vercel.app'));
   const cookies=new Map();
@@ -18,7 +19,7 @@ async function main(){
   if(config.share){const exchange=new URL('/',base);exchange.searchParams.set('_vercel_share',config.share);const response=await send(exchange);if(response.status!==200)throw Error('Could not authenticate the deployment test client ('+response.status+').');}
   const endpoint=new URL('/mcp',base),auth=config.token?'Bearer '+config.token:undefined;
   const checks=[];
-  async function check(name,fn){await fn();checks.push(name);}
+  async function check(name,fn){currentCheck=name;await fn();checks.push(name);}
   async function call(method,params={},extra={}){return send(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json, text/event-stream',...(auth?{Authorization:auth}:{}),...extra},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});}
   await check('Missing Bearer returns 401',async()=>{const r=await call('tools/list',{}, {Authorization:''});assert.equal(r.status,401);assert.match(r.headers.get('www-authenticate'),/^Bearer/);assert.equal((await r.json()).error,'Unauthorized');});
   await check('Wrong Bearer returns 401',async()=>assert.equal((await call('tools/list',{}, {Authorization:'Bearer invalid-test-value'})).status,401));
@@ -38,4 +39,4 @@ async function main(){
   await check('Existing map remains available',async()=>{const r=await send(new URL('/',base));assert.equal(r.status,200);assert((await r.text()).includes('GEORADAR'));});
   console.log(JSON.stringify({url:base.origin,passed:checks.length,checks},null,2));
 }
-main().catch(()=>{console.error('Remote MCP verification failed; no credentials or response bodies logged.');process.exitCode=1;});
+main().catch(error=>{console.error(JSON.stringify({failed:currentCheck,code:error.code||error.cause?.code||null,actual:typeof error.actual==='number'?error.actual:undefined,expected:typeof error.expected==='number'?error.expected:undefined}));process.exitCode=1;});

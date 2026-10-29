@@ -56,7 +56,7 @@ Der freie PLZ-Filter unterstützt z.B. `88, 89, 78, 88046, 6850`. Er filtert vor
 
 Echte PLZ-Flächen lassen sich optional als GeoJSON importieren: FeatureCollection, Polygon/MultiPolygon, WGS84, properties.country DE/AT und properties.postalCode vollständiger PLZ-Text. Quelle/Nutzungsrecht angeben. Maximal 20 MB, 30.000 Flächen, 500.000 Koordinaten. Ohne Flächendatensatz werden keine Gebietsflächen erzeugt. Formale Validierung ist keine amtliche Beglaubigung. Polygone bleiben nur in der aktuellen Sitzung; Originaldatei für erneutes Laden behalten.
 
-Gebietszuordnungen sind im Unternehmensexport enthalten. Ein nur mit territories befüllter JSON-Import ohne records wird abgelehnt. Der ergänzende Prompt liegt unter dist/Vertriebsgebiete-ergaenzen-Prompt.txt und ist in der Oberfläche herunterladbar.
+Gebietszuordnungen sind im Unternehmensexport enthalten. Ein nur mit territories befüllter JSON-Import ohne records wird abgelehnt. Der ergänzende Prompt liegt unter dist/Vertriebsgebiete-ergaenzen-Prompt.txt.
 
 ## Eigener Standort
 
@@ -68,7 +68,7 @@ Werkzeugname und Ressourcen-URI bleiben zum bisherigen Ansatz kompatibel:
 
 - Werkzeug show_georadar_map, Argumente wie im Unternehmensformat oben.
 - Ressource ui://georadar/map-v1.html, MIME text/html;profile=mcp-app.
-- Server bündelt MapLibre, Logo, CSS, Skripte, Prompt und Kartenstil in einer HTML-Ressource; keine kaputten relativen Asset-Pfade.
+- Server bündelt MapLibre, Logo, CSS, Skripte und Kartenstil in einer HTML-Ressource; keine kaputten relativen Asset-Pfade.
 - UI-Handschlag ui/initialize; danach Verarbeitung von ui/notifications/tool-result mit structuredContent. Partielle/ungeprüfte Eingaben werden nicht gezeichnet. Nur direkter Parent und nach Handshake dieselbe Origin dürfen Ergebnisse übergeben.
 - CSP-Metadaten erlauben OpenFreeMap-Ressourcen sowie blob-Ressourcen für Worker. Der konkrete Langdock-Host muss WebGL, Worker, diese Quellen und die Ressourcengröße unterstützen. Lokal im sandboxed iframe geprüft; echter Workspace-Test steht aus.
 

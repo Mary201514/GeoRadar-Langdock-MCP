@@ -7,7 +7,8 @@ function bundle(){
   const scripts=[];
   for(const name of ['maplibre-gl.js','context-mask.js','data-model.js','companies.js','territories.js','mcp-bridge.js','app.js']){
     html=html.replace('<script defer src="'+name+'"></script>','');
-    scripts.push('<script>'+fs.readFileSync(path.join(dist,name),'utf8').replace(/<\/script/gi,'<\\/script')+'</script>');
+    const source=name==='mcp-bridge.js'?path.join(__dirname,'app-bridge.js'):path.join(dist,name);
+    scripts.push('<script>'+fs.readFileSync(source,'utf8').replace(/<\/script/gi,'<\\/script')+'</script>');
   }
   html=html.replace('src="mangold.svg"','src="data:image/svg+xml;base64,'+fs.readFileSync(path.join(dist,'mangold.svg')).toString('base64')+'"');
   const style='<script>window.GEORADAR_STYLE='+JSON.stringify(JSON.parse(fs.readFileSync(path.join(dist,'base-style.json'),'utf8'))).replace(/</g,'\\u003c')+';</script>';

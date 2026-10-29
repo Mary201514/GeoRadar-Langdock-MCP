@@ -1,0 +1,18 @@
+'use strict';
+const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
+const D=require('../dist/data-model.js');let listener,events=[],messages=[];
+const parent={postMessage:m=>messages.push(m)},status={};
+const context={crypto:require('node:crypto').webcrypto,setTimeout:()=>1,clearTimeout:()=>{},CustomEvent:class{constructor(type,o){this.type=type;this.detail=o.detail;}},document:{getElementById:()=>status,addEventListener:()=>{},dispatchEvent:e=>events.push(e)},window:{parent,GeoRadarData:D,addEventListener:(type,f)=>{if(type==='message')listener=f;}}};
+vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'app-bridge.js'),'utf8'),context);
+const send=(data,origin='https://host.invalid',source=parent)=>listener({source,origin,data:{jsonrpc:'2.0',...data}});
+send({id:messages[0].id,result:{protocolVersion:'2026-01-26'}},'https://attacker.invalid',{});assert.equal(messages.length,1);
+send({id:messages[0].id,result:{protocolVersion:'2026-01-26'}});assert(messages.some(m=>m.method==='ui/notifications/initialized'));
+const records=[{id:'DUMMY-AT',name:'Fiktive Testfirma',country:'AT',lon:16.373,lat:48.208,status:'priority',locationAccuracy:'approximate'}];
+send({method:'ui/notifications/tool-input-partial',params:{arguments:{records}}});assert.equal(events.length,0);
+send({method:'ui/notifications/tool-input',params:{arguments:{records}}},'https://attacker.invalid');assert.equal(events.length,0);
+send({method:'ui/notifications/tool-input',params:{arguments:{records}}});assert.equal(events.at(-1).detail.structuredContent.records[0].country,'Österreich');
+send({method:'ui/notifications/tool-result',params:{content:[{type:'text',text:JSON.stringify({records})}]}});assert.equal(events.at(-1).detail.structuredContent.records[0].status,'priority');
+send({method:'ui/notifications/tool-result',params:{structuredContent:{records:[]}}});assert.equal(events.at(-1).detail.structuredContent.records.length,0);
+const n=events.length;send({method:'ui/notifications/tool-result',params:{structuredContent:{records:[{}]}}});assert.equal(events.length,n);
+send({method:'ui/notifications/tool-result',params:{isError:true}});assert.equal(events.at(-1).detail.isError,true);
+console.log('PASS: parent/origin binding, initialization, partial-input rejection, full AT input, JSON fallback, empty results, invalid data and tool errors.');

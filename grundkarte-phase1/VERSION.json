@@ -1,0 +1,74 @@
+{
+  "name": "MANGOLD GEORADAR 3D",
+  "phase": 1,
+  "date": "2026-10-29",
+  "sourceCommit": "8123598e3e330c7cacbcad320ddc8d10207a0696",
+  "site": "https://mangold-georadar-grundkarte.mangoldgmbh-4649.chatgpt.site/",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 6021,
+      "gitBlobSha": "70213563c9f59ef60172d13865f182e9d25eb9cc"
+    },
+    {
+      "path": "serve.cjs",
+      "bytes": 1000,
+      "gitBlobSha": "1b56a00ad3d7b27f31545092a8765a71dd2c92f2"
+    },
+    {
+      "path": ".openai/hosting.json",
+      "bytes": 106,
+      "gitBlobSha": "bec61e2dee1e378ccfb7a92e46e802865511bcf6"
+    },
+    {
+      "path": "dist/app.js",
+      "bytes": 11717,
+      "gitBlobSha": "1a29026270ae0bcc2b5ed235bcb1535c2f44193d"
+    },
+    {
+      "path": "dist/base-style.json",
+      "bytes": 43311,
+      "gitBlobSha": "21e98f80afa6fdd24fce2c653c7a708c0c9d8a18"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 10061,
+      "gitBlobSha": "d6cfd4071d1e40cfb4043ef11227846db95b963d"
+    },
+    {
+      "path": "dist/licenses/Liberty-LICENSE.md",
+      "bytes": 3223,
+      "gitBlobSha": "b862282f05eec17ab52a5ce253d2b892fedd6c1c"
+    },
+    {
+      "path": "dist/licenses/MapLibre-LICENSE.txt",
+      "bytes": 5984,
+      "gitBlobSha": "1e8acbb54fa7baddc844377507cc5a79353174fb"
+    },
+    {
+      "path": "dist/licenses/OpenFreeMap-styles-LICENSE.md",
+      "bytes": 4118,
+      "gitBlobSha": "2b0594fa3cdac5633f0e880aefe3aa3ea7fd502f"
+    },
+    {
+      "path": "dist/mangold.svg",
+      "bytes": 7724,
+      "gitBlobSha": "72445f00699b0738133df8dd11740844490f2bd6"
+    },
+    {
+      "path": "dist/maplibre-gl.css",
+      "bytes": 69449,
+      "gitBlobSha": "172ddf49288e996eb292a9eff9302da40951dcb3"
+    },
+    {
+      "path": "dist/maplibre-gl.js",
+      "bytes": 1015688,
+      "gitBlobSha": "29ce35d5ca63f3c269a6a06e7cb183562f1c3d95"
+    },
+    {
+      "path": "dist/style.css",
+      "bytes": 13052,
+      "gitBlobSha": "204d1a64e9d97770c6e5f0ed74ca50041c30664f"
+    }
+  ]
+}

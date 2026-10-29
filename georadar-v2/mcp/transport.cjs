@@ -9,7 +9,8 @@ function createTransport({dispatch,getToken=()=>process.env.GEORADAR_TOKEN,getAl
     const json=(status,body,extra={})=>new Response(body===undefined?null:JSON.stringify(body),{status,headers:{...headers,...(body===undefined?{}:{'Content-Type':'application/json; charset=utf-8'}),...extra}});
     // No fallback token: a missing or weak server secret closes the endpoint.
     const token=getToken();
-    if(typeof token!=='string'||token.length<32||token.length>512||/\s/.test(token))return json(503,{error:'MCP_NOT_CONFIGURED',message:'GEORADAR_TOKEN muss serverseitig als geheimer Wert mit mindestens 32 Zeichen konfiguriert sein.'});
+    const configurationIssue=typeof token!=='string'||!token?'missing':token.length<32?'too_short':token.length>512?'too_long':/\s/.test(token)?'whitespace':null;
+    if(configurationIssue){console.error('GeoRadar MCP configuration: '+configurationIssue);return json(503,{error:'MCP_NOT_CONFIGURED',message:'GEORADAR_TOKEN muss serverseitig als geheimer Wert mit mindestens 32 Zeichen konfiguriert sein.'});}
     const auth=request.headers.get('authorization')||'',match=/^Bearer ([^\s]+)$/i.exec(auth);
     const provided=match?.[1]||'';
     const hash=value=>crypto.createHash('sha256').update(value).digest();

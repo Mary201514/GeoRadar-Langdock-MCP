@@ -2,11 +2,16 @@
 const crypto=require('node:crypto');
 const PROTOCOLS=['2025-11-25','2025-06-18','2025-03-26'];
 const MAX_BODY=2*1024*1024;
-function createTransport({dispatch,getToken=()=>process.env.GEORADAR_TOKEN,getAllowedOrigin=()=>process.env.ALLOWED_ORIGIN}={}){
+function createTransport({dispatch,getToken=()=>process.env.GEORADAR_TOKEN,getAllowedOrigin=()=>process.env.ALLOWED_ORIGIN,getTestMode=()=>process.env.GEORADAR_TEST_MODE,getTestUntil=()=>process.env.GEORADAR_TEST_UNTIL,now=()=>Date.now()}={}){
   if(typeof dispatch!=='function')throw Error('MCP dispatch is required');
   return async function transport(request){
     const headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Vary':'Authorization, Origin'};
     const json=(status,body,extra={})=>new Response(body===undefined?null:JSON.stringify(body),{status,headers:{...headers,...(body===undefined?{}:{'Content-Type':'application/json; charset=utf-8'}),...extra}});
+    // Public access requires explicit, time-limited dummy mode. Expiry restores Bearer auth.
+    const until=Date.parse(getTestUntil()||'');
+    const publicDummy=getTestMode()==='public-dummy'&&Number.isFinite(until)&&now()<until;
+    if(publicDummy)headers['X-GeoRadar-Mode']='public-dummy';
+    if(!publicDummy){
     // No fallback token: a missing or weak server secret closes the endpoint.
     const token=getToken();
     const configurationIssue=typeof token!=='string'||!token?'missing':token.length<32?'too_short':token.length>512?'too_long':/\s/.test(token)?'whitespace':null;
@@ -15,6 +20,7 @@ function createTransport({dispatch,getToken=()=>process.env.GEORADAR_TOKEN,getAl
     const provided=match?.[1]||'';
     const hash=value=>crypto.createHash('sha256').update(value).digest();
     if(!match||provided.length>512||!crypto.timingSafeEqual(hash(provided),hash(token)))return json(401,{error:'Unauthorized'},{'WWW-Authenticate':'Bearer realm="Mangold GeoRadar"'});
+    }
     const origin=request.headers.get('origin');
     if(origin){const allowed=new Set([new URL(request.url).origin,'https://mangold-georadar.vercel.app']);const configured=getAllowedOrigin();if(configured)allowed.add(configured);if(!allowed.has(origin))return json(403,{error:'Origin not allowed'});}
     // SSE GET is optional in Streamable HTTP. This stateless server responds via JSON POST.
@@ -41,7 +47,17 @@ function createTransport({dispatch,getToken=()=>process.env.GEORADAR_TOKEN,getAl
       if(message.method==='initialize'){
         const p=message.params;if(!p||typeof p.protocolVersion!=='string'||!p.capabilities||typeof p.capabilities!=='object'||!p.clientInfo||typeof p.clientInfo.name!=='string'||typeof p.clientInfo.version!=='string')return json(200,{jsonrpc:'2.0',id:message.id,error:{code:-32602,message:'initialize requires protocolVersion, capabilities and clientInfo'}});
       }
-      const result=await dispatch(message);
+      if(publicDummy&&message.method==='tools/call'){
+        const records=message.params?.arguments?.records;
+        if(!Array.isArray(records)||records.length>100||records.some(r=>!r||typeof r.id!=='string'||!/^(?:DUMMY-|TEST-|TECHNICAL-TEST-)/i.test(r.id)||typeof r.name!=='string'||!/(?:dummy|test|fiktiv)/i.test(r.name))){
+          return json(200,{jsonrpc:'2.0',id:message.id,result:{isError:true,content:[{type:'text',text:'Öffentlicher Dummy-Test: höchstens 100 Datensätze; jede ID muss mit DUMMY- oder TEST- beginnen und jeder Firmenname Dummy, Test oder Fiktiv enthalten. Keine echten Kunden- oder ERP-Daten übergeben.'}]}});
+        }
+      }
+      let result=await dispatch(message);
+      if(publicDummy&&message.method==='tools/list'&&result?.result?.tools){
+        result=structuredClone(result);
+        for(const tool of result.result.tools){tool.description='ÖFFENTLICHER DUMMY-TEST, zeitlich begrenzt. Maximal 100 ausschließlich fiktive Datensätze. IDs beginnen mit DUMMY- oder TEST-; Firmennamen enthalten Dummy, Test oder Fiktiv. Keine echten Kunden- oder ERP-Daten. '+tool.description;if(tool.inputSchema?.properties?.records)tool.inputSchema.properties.records.maxItems=100;}
+      }
       // Explicitly cap serialized responses below Vercel's request/response limit.
       if(Buffer.byteLength(JSON.stringify(result))>4*1024*1024)return json(413,{error:'MCP result exceeds 4 MiB. Reduce the dataset.'});
       return json(200,result);

@@ -32,3 +32,10 @@ Code: e32166393ea7a6e65321144de99f73e2864dc73b, Branch georadar-marker-mcp-v2.
 - Die 14 authentifizierten Preview-Tests belegten Werkzeugerkennung und Dummy-Datenübergabe mit separatem Test-Token. Ein gültiger Bearer-Aufruf in Production wurde nicht durchgeführt, weil der Production-Token nicht ausgelesen wird. Der echte Langdock-Login und die iframe-Darstellung bleiben offen.
 - Verbindung: https://mangold-georadar.vercel.app/mcp, Streamable HTTP, Authorization: Bearer mit dem Production-Token. Zusätzlich bei aktiver Deployment Protection: separater x-vercel-protection-bypass aus Vercel Protection Bypass for Automation.
 - Keine Änderungen an den Kartendateien, keine ERP-Anbindung, keine Schlüssel im Repository.
+
+
+## Öffentlicher Dummy-Test
+
+Deployment dpl_9qD5TxmgHMaCSr5B2geykWQC6Utt READY, Produktionsadresse aktiv. Code-Commit 1cac051a1d943ea9c656831cd62178a26a74873a. 12 lokale Testmodus-Prüfungen und 11 tatsächliche öffentliche HTTPS-Prüfungen erfolgreich, ohne Token, Cookies oder Vercel-Bypass. Geprüft: initialize, show_georadar_map-Erkennung mit Dummy-Limits, vier Status mit einer Firma ohne Koordinaten, Abweisung unmarkierter Daten, Abweisung über 100 Datensätze, MCP-App-Ressource, notifications 202, fremde Origin 403, GET 405, ungültiges JSON 400, unveränderte Karte HTTP 200. Ablauf und automatische Wiederherstellung der Bearer-Prüfung lokal erfolgreich geprüft. Bestehender MCP-Kern und Auth-Transporttests weiterhin erfolgreich. Frontend-Diff leer.
+
+Vercel Standard Protection prod_deployment_urls_and_all_previews aktiv. Produktionsdomain öffentlich, Vorschauen und Deployment-URLs geschützt. Keine bestehenden Secrets geändert oder gelöscht; nur zwei nicht geheime TEST-Konfigurationsvariablen angelegt. Ende der tokenfreien MCP-Freigabe: 2026-10-30T14:15:00Z (15:15 Uhr Europe/Berlin). Anleitung für Zugriff und Rückstellung: PUBLIC-DUMMY-TEST.md. Echter Langdock-Workspace-Login/iframe-Render nicht durchgeführt; öffentliche MCP-Protokolltests erfolgreich.

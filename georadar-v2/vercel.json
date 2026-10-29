@@ -3,5 +3,15 @@
   "framework": null,
   "buildCommand": "",
   "installCommand": "",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "functions": {
+    "api/mcp.mjs": {
+      "includeFiles": "{dist/**,mcp/**}",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/mcp", "destination": "/api/mcp" },
+    { "source": "/mcp/", "destination": "/api/mcp" }
+  ]
 }

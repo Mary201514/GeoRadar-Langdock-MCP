@@ -1,0 +1,34 @@
+'use strict';
+const assert=require('node:assert/strict'),crypto=require('node:crypto');
+const {createTransport,MAX_BODY}=require('./transport.cjs'),{handle,URI}=require('./server.cjs');
+async function main(){
+  const secret=crypto.randomBytes(32).toString('hex');
+  const app=createTransport({dispatch:handle,getToken:()=>secret});
+  const request=(payload,options={})=>new Request('https://mangold-georadar.vercel.app/mcp',{method:options.method||'POST',headers:{'Content-Type':'application/json',Accept:'application/json, text/event-stream',Authorization:'Bearer '+secret,...options.headers},...((options.method||'POST')==='GET'?{}:{body:typeof payload==='string'?payload:JSON.stringify(payload)})});
+  const call=(method,params={})=>app(request({jsonrpc:'2.0',id:1,method,params}));
+  assert.equal((await createTransport({dispatch:handle,getToken:()=>undefined})(request({}))).status,503);
+  assert.equal((await createTransport({dispatch:handle,getToken:()=>''})(request({}))).status,503);
+  for(const auth of ['', 'Bearer incorrect', 'Basic test', 'Bearer '+secret+'extra'])assert.equal((await app(request({}, {headers:{Authorization:auth}}))).status,401);
+  assert.equal((await app(request({}, {headers:{Origin:'https://attacker.invalid'}}))).status,403);
+  assert.equal((await app(request({}, {method:'GET'}))).status,405);
+  assert.equal((await app(request({}, {headers:{'Content-Type':'text/plain'}}))).status,415);
+  assert.equal((await app(request({}, {headers:{Accept:'text/html'}}))).status,406);
+  assert.equal((await app(request({}, {headers:{'MCP-Protocol-Version':'unsupported'}}))).status,400);
+  assert.equal((await app(request('{broken'))).status,400);
+  assert.equal((await app(request([]))).status,400);
+  assert.equal((await app(request({jsonrpc:'2.0',id:true,method:'ping'}))).status,400);
+  assert.equal((await app(request(' '.repeat(MAX_BODY+1)))).status,413);
+  const initialize=await call('initialize',{protocolVersion:'2025-06-18',capabilities:{extensions:{'io.modelcontextprotocol/ui':{mimeTypes:['text/html;profile=mcp-app']}}},clientInfo:{name:'georadar-test',version:'1'}});
+  assert.equal(initialize.status,200);const init=await initialize.json();assert.equal(init.result.protocolVersion,'2025-06-18');assert(!initialize.headers.has('mcp-session-id'));
+  assert.equal((await app(request({jsonrpc:'2.0',method:'notifications/initialized'}))).status,202);
+  assert.equal((await (await call('tools/list')).json()).result.tools[0].name,'show_georadar_map');
+  assert.equal((await (await call('resources/list')).json()).result.resources[0].uri,URI);
+  const html=(await (await call('resources/read',{uri:URI})).json()).result.contents[0];assert(html.text.includes('GEORADAR_CONTEXT_MASK'));assert(html.text.includes('ui/initialize'));assert(Buffer.byteLength(JSON.stringify(html))<4*1024*1024);
+  const fixture={id:'TEST-ONLY',name:'Technischer Test, kein reales Unternehmen',country:'DE',status:'priority',lon:13.405,lat:52.52,locationAccuracy:'approximate'};
+  const data=(await (await call('tools/call',{name:'show_georadar_map',arguments:{records:[fixture]}})).json()).result;assert.equal(data.structuredContent.summary.priority,1);assert.equal(data.structuredContent.records[0].locationAccuracy,'approximate');
+  const invalid=(await (await call('tools/call',{name:'show_georadar_map',arguments:{records:[{}]}})).json()).result;assert.equal(invalid.isError,true);
+  assert.equal((await (await call('unknown-method')).json()).error.code,-32601);
+  const api=await import('../api/mcp.mjs');assert.equal((await api.POST(request({}))).status,503);
+  console.log('PASS: fail-closed configuration, Bearer auth, Origin, HTTP methods/headers, limits, protocol negotiation, notifications, stateless tools/resources, app bundle, valid/invalid test data, Vercel adapter.');
+}
+main().catch(e=>{console.error(e.message);process.exitCode=1;});

@@ -23,7 +23,7 @@ Im Ordner dieser Datei `vercel --prod` ausführen, nachdem die Vercel-CLI angeme
 
 ## Umfang
 
-Veröffentlicht werden nur statische Kartendateien. `mcp/server.cjs` wird dadurch nicht als Langdock-MCP-Server betrieben. Dafür ist weiterhin ein gesonderter HTTPS-Endpunkt oder eine ausdrücklich zu entwickelnde serverlose Vercel-Anpassung erforderlich. Die Firmen werden beim Aufruf nicht automatisch importiert oder gespeichert.
+Veröffentlicht werden nur statische Kartendateien. Der zusätzliche Adapter `api/mcp.mjs` stellt den bestehenden MCP-Kern serverlos unter `/mcp` bereit. Er benötigt GEORADAR_TOKEN als Production-Secret und wird ohne gültigen Secret nicht freigeschaltet. Details und Langdock-Einrichtung: LANGDOCK-VERCEL.md. Die Firmen werden beim Aufruf nicht automatisch importiert oder gespeichert.
 
 Kartenkacheln, Glyphen und Sprites benötigen Zugriff auf `https://tiles.openfreemap.org`. MapLibre-Bibliothek, CSS, Logo und Kontextmaske sind bereits lokal enthalten.
 

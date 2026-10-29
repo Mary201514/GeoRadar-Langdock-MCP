@@ -92,3 +92,8 @@ Karten sind zoomabhängig generalisiert, keine amtliche Vermessung. Browser ben�
 
 
 Darstellung der Nachbarländer: blasse Kontextmaske in Übersichtszooms auf Basis vorhandener echter Länder-/Bundesland-Geometrien. Bei Detailzoom blendet sie aus. Quellen und Bearbeitung: dist/licenses/context-mask-SOURCES.txt. OSM-Grenzlinien und Unternehmensmarker bleiben erhalten.
+
+
+## MCP auf Vercel
+
+Der neue Adapter api/mcp.mjs stellt denselben MCP-Kern serverlos unter /mcp bereit. Karte und dist-Dateien bleiben unverändert. Vercel Production benötigt GEORADAR_TOKEN als Secret; ohne gültige Konfiguration bleibt der Endpunkt geschlossen. Einrichtung, zusätzliche Vercel-Zugriffsschutzebene und Tests: [LANGDOCK-VERCEL.md](LANGDOCK-VERCEL.md).

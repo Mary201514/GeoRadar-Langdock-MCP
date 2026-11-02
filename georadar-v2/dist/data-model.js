@@ -1,8 +1,15 @@
-(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.GeoRadarData=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./postal-prefixes.js'));else root.GeoRadarData=factory(root.GeoRadarPostalPrefixes);})(typeof globalThis!=='undefined'?globalThis:this,function(P){
   'use strict';
   const statuses={existing:{label:'Bestandskunde',color:'#2387ec'},prospect:{label:'Potenzieller Neukunde',color:'#ffffff'},priority:{label:'Besonders interessant',color:'#e0444e'},unknown:{label:'Status ungeklärt',color:'#788592'}};
   const aliases={Bestandskunde:'existing',Bestandskunden:'existing',Neukunde:'prospect',Neukunden:'prospect','Potenzieller Neukunde':'prospect','Besonders interessant':'priority','Status ungeklärt':'unknown'};
-  const optional=['customerNumber','street','postalCode','city','state','district','industry','product','potential','contact','notes','relationships','coordinateSource','personnelNumber','salesRep'];
+  const optional=['customerNumber','street','postalCode','postalPrefix','city','state','district','industry','product','potential','contact','notes','relationships','coordinateSource','personnelNumber','salesRep'];
+  function position(r){
+    if(Number.isFinite(r.lon)&&Number.isFinite(r.lat))return {coordinates:[r.lon,r.lat],isPrefix:false};
+    const prefix=r.postalPrefix||(/^\d{2}$/.test(r.postalCode||'')?r.postalCode:undefined);
+    const ref=P?.countries?.[r.country==='Deutschland'||r.country==='DE'?'DE':'AT']?.[prefix];
+    return ref?{coordinates:ref.coordinates.slice(),isPrefix:true,prefix}:null;
+  }
+  function postalLabel(r){return r.postalPrefix&&(!r.postalCode||r.postalCode.length===2)?'PLZ-Präfix '+r.postalPrefix+'…':r.postalCode||'';}
   function validateTerritories(value){
     if(!Array.isArray(value)||value.length>4)throw Error('territories muss eine Liste mit höchstens CO, SR, SH und GD sein.');
     const codes=new Set();return value.map(t=>{if(!t||!['CO','SR','SH','GD'].includes(t.code)||codes.has(t.code))throw Error('Gebietskürzel muss eindeutig CO, SR, SH oder GD sein.');codes.add(t.code);if(typeof t.personnelNumber!=='string'||t.personnelNumber.length>100)throw Error('Personalnummer muss Text sein (auch leer erlaubt).');if(!Array.isArray(t.rules)||t.rules.length>2)throw Error('Gebietsregeln fehlen.');const countries=new Set();return {code:t.code,personnelNumber:t.personnelNumber.trim(),rules:t.rules.map(r=>{if(!r||!['DE','AT'].includes(r.country)||countries.has(r.country)||!Array.isArray(r.prefixes)||r.prefixes.length>200)throw Error('Gebietsregel benötigt ein eindeutiges Land und höchstens 200 PLZ-Präfixe.');countries.add(r.country);if(r.prefixes.some(p=>typeof p!=='string'||!(r.country==='DE'?/^\d{1,5}$/:/^\d{1,4}$/).test(p)))throw Error('Ungültiges PLZ-Präfix in '+t.code);return {country:r.country,prefixes:[...new Set(r.prefixes)]};})};});
@@ -26,14 +33,17 @@
         const status=raw.status??raw.category??'unknown';r.status=aliases[status]||status;
         if(!Object.hasOwn(statuses,r.status))throw Error('Unbekannter Kundenstatus.');
         for(const field of optional){if(raw[field]===undefined||raw[field]===null)continue;if(typeof raw[field]!=='string'||raw[field].length>4000)throw Error(field+' muss Text mit höchstens 4.000 Zeichen sein.');r[field]=raw[field].trim();}
-        if(r.postalCode&&!((r.country==='Deutschland'?/^\d{5}$/:/^\d{4}$/).test(r.postalCode)))throw Error('PLZ muss '+(r.country==='Deutschland'?'fünf':'vier')+'stellig als Text übergeben werden.');
+        if(r.postalCode&&!((r.country==='Deutschland'?/^(?:\d{2}|\d{5})$/:/^(?:\d{2}|\d{4})$/).test(r.postalCode)))throw Error('PLZ muss vollständig oder als zweistelliges Präfix als Text übergeben werden.');
+        if(r.postalCode?.length===2){if(r.postalPrefix&&r.postalPrefix!==r.postalCode)throw Error('PLZ und PLZ-Präfix widersprechen sich.');r.postalPrefix=r.postalCode;}
+        if(r.postalPrefix&&!/^\d{2}$/.test(r.postalPrefix))throw Error('postalPrefix muss aus genau zwei Ziffern bestehen.');
+        if(r.postalCode&&r.postalPrefix&&!r.postalCode.startsWith(r.postalPrefix))throw Error('PLZ und PLZ-Präfix widersprechen sich.');
         for(const field of ['leadScore','revenue'])if(raw[field]!==undefined&&raw[field]!==null){if(typeof raw[field]!=='number'||!Number.isFinite(raw[field])||raw[field]<0||(field==='leadScore'&&raw[field]>100))throw Error(field+' ist ungültig.');r[field]=raw[field];}
         const hasLon=raw.lon!==undefined&&raw.lon!==null,hasLat=raw.lat!==undefined&&raw.lat!==null;
         if(hasLon!==hasLat)throw Error('lon und lat müssen gemeinsam vorliegen oder beide fehlen.');
         if(hasLon){if(typeof raw.lon!=='number'||typeof raw.lat!=='number'||!Number.isFinite(raw.lon)||!Number.isFinite(raw.lat)||raw.lon<5||raw.lon>18||raw.lat<46||raw.lat>56)throw Error('Koordinaten liegen außerhalb des unterstützten DE/AT-Kartenausschnitts oder sind ungültig.');r.lon=raw.lon;r.lat=raw.lat;}
         r.locationAccuracy=raw.locationAccuracy??'unknown';
         if(!['exact','approximate','unknown'].includes(r.locationAccuracy))throw Error('locationAccuracy muss exact, approximate oder unknown sein.');
-        if(!hasLon){r.locationAccuracy='unknown';warnings.push(prefix+'Keine Koordinaten: Unternehmen bleibt in der Liste, ohne Kartenmarker.');}
+        if(!hasLon){r.locationAccuracy='unknown';warnings.push(prefix+(position(r)?.isPrefix?'Nur PLZ-Präfix '+r.postalPrefix+'…: schematischer Gebietspunkt nach GeoNames, kein Firmenstandort.':'Keine Koordinaten oder verfügbare Präfixreferenz: Unternehmen bleibt in der Liste, ohne Kartenmarker.'));}
         else if(r.locationAccuracy!=='exact')warnings.push(prefix+'Ungefähre oder ungeprüfte Position.');
         records.push(r);
       }catch(e){errors.push(prefix+e.message);}
@@ -41,6 +51,6 @@
     if(errors.length){const e=Error(errors.slice(0,20).join('\n')+(errors.length>20?'\nWeitere Fehler: '+(errors.length-20):''));e.validationErrors=errors;throw e;}
     const result={schema:'mangold-georadar/companies/v1',records,warnings};if(payload.territories!==undefined)result.territories=validateTerritories(payload.territories);return result;
   }
-  function summarize(records){const counts={existing:0,prospect:0,priority:0,unknown:0};let located=0;for(const r of records){counts[r.status]++;if(Number.isFinite(r.lon)&&Number.isFinite(r.lat))located++;}return {...counts,total:records.length,located,unlocated:records.length-located};}
-  return {statuses,validate,summarize,validateTerritories};
+  function summarize(records){const counts={existing:0,prospect:0,priority:0,unknown:0};let located=0,prefixLocated=0;for(const r of records){counts[r.status]++;if(Number.isFinite(r.lon)&&Number.isFinite(r.lat))located++;else if(position(r)?.isPrefix)prefixLocated++;}return {...counts,total:records.length,located,prefixLocated,unlocated:records.length-located-prefixLocated};}
+  return {statuses,validate,summarize,validateTerritories,position,postalLabel};
 });

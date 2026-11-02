@@ -1,0 +1,16 @@
+{
+  "id": "ca9dde40-bc36-44ee-b431-2056b7524d4c",
+  "name": "georadar-langdock",
+  "color": null,
+  "description": "",
+  "authType": "API_KEY",
+  "integrationType": "MCP",
+  "suite": null,
+  "authFields": [],
+  "mcpClient": {
+    "url": "https://mangold-georadar.vercel.app/mcp",
+    "protocolVersion": "2025-11-25",
+    "clientVersion": "1.1.0",
+    "transportType": "STREAMABLE_HTTP"
+  }
+}

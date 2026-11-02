@@ -26,6 +26,8 @@ with zipfile.ZipFile(out/'Mangold-GeoRadar-Supabase-Integration.zip') as z:
 guide=(root/'SUPABASE-LANGDOCK-SETUP.md').read_bytes()
 (out/'README-EINRICHTUNG.md').write_bytes(guide)
 report={'importFormatChecks':'passed against supplied native export structures','credentialsIncluded':False,'workspaceActionBinding':'required after import; original agent export had actions=[]','technicalTests':'9 Supabase contract-double tests and real Chrome full local pipeline passed; core, transport, bridge and PLZ tests passed','liveSupabase':'not confirmed yet','actualLangdockImport':'not confirmed yet'}
+live_report=root/'verification/research-production-readiness.json'
+if live_report.exists():report['vercelReadiness']=json.loads(live_report.read_text(encoding='utf-8'))
 (out/'TESTSTATUS.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 source_names=['serve.cjs','vercel.json','.env.example','.gitignore','SUPABASE-LANGDOCK-SETUP.md']
 for folder in ['api','backend','dist','mcp','supabase','test','scripts','langdock']:

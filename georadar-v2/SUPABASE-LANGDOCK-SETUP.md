@@ -59,3 +59,7 @@ Die Simulation ist ausdrücklich kein Live-Supabase-Test und kein bestätigter L
 https://supabase.com/docs/guides/getting-started/api-keys
 https://supabase.com/docs/guides/database/postgres/row-level-security
 https://docs.langdock.com/en/using-langdock/guides/integrations/mcp/mcp
+
+## Veröffentlichung dieses Stands
+
+Auf Vercel veröffentlicht: Produktions-Karte und /AB382 liefern HTTP 200; POST /mcp und POST /api/research ohne Bearer liefern 401; GET /api/research ohne Kennung liefert 400. Der Datenbankabruf liefert derzeit 503 STORAGE_NOT_CONFIGURED. Das bestätigt die fehlende Supabase-Konfiguration und ist kein erfolgreicher Live-Speichertest. Die Importdateien sind strukturell gegen die bereitgestellten Exporte geprüft; ein tatsächlicher Langdock-Import und die Workspace-Aktionszuordnung sind noch offen.

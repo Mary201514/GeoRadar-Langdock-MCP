@@ -13,8 +13,19 @@ def dump(obj): return json.dumps(obj, ensure_ascii=False, indent=2) + '\n'
 def node_json(expression):
     return json.loads(subprocess.check_output(['node', '-e', 'process.stdout.write(JSON.stringify(' + expression + '))'], cwd=root).decode('utf-8'))
 def read_template(name):
-    with zipfile.ZipFile(downloads / name) as z:
-        return json.loads(z.read('manifest.json'))
+    template = source / ('template-agent.json' if name.startswith('Mangold LeadRadar') else 'template-integration.json')
+    if (downloads / name).exists():
+        with zipfile.ZipFile(downloads / name) as z:
+            data = json.loads(z.read('manifest.json'))
+        if name.startswith('Mangold LeadRadar'):
+            data['actions'] = []
+            data['subagents'] = []
+        else:
+            data['authFields'] = []
+            data['mcpClient'] = {k:v for k,v in data.get('mcpClient',{}).items() if k in ('url','protocolVersion','clientVersion','transportType')}
+        template.write_text(dump(data),encoding='utf-8')
+        return data
+    return json.loads(template.read_text(encoding='utf-8'))
 
 ids_path = source / 'package-identities.json'
 if ids_path.exists(): ids = json.loads(ids_path.read_text(encoding='utf-8'))
@@ -79,6 +90,7 @@ industry_rule = re.search(r'\*\*Branchenliste:\*\* (.*?)(?:\n|$)', original_inst
 if industry_rule:
     agent['instruction'] = agent['instruction'].replace('## Recherchequalität', '## Recherchequalität\n'+industry_rule.group(1)+'\nStandardpriorität bei fehlender Region: Süddeutschland, dann Vorarlberg, dann übriges Deutschland und Österreich.')
 agent['instruction'] = agent['instruction'].replace('Ohne Kennung nachfragen,', 'Ohne Titel verwende "Recherche " plus Kennung; keinen leeren Titel übergeben. Ohne Kennung nachfragen,')
+agent['instruction'] = agent['instruction'].replace('danach die bestätigte Kennung und den bestätigten Kartenlink.', 'danach die bestätigte Kennung und nur bei öffentlich freigegebenen Dummy-Daten den bestätigten Kartenlink. Bei internen B2B-Daten keine öffentliche Darstellung behaupten.')
 
 integration.update(id=ids['integration'], name='Mangold GeoRadar – Supabase', description='Speichert Recherchen unter Kennung und lädt gespeicherte Ergebnisse. Native MCP-Verbindung; Zugangsdaten erst beim Verbinden in Langdock eintragen.', authType='API_KEY', integrationType='MCP', authFields=[])
 integration['mcpClient']={'url':'https://mangold-georadar.vercel.app/mcp','protocolVersion':'2025-11-25','clientVersion':'1.1.0','transportType':'STREAMABLE_HTTP'}

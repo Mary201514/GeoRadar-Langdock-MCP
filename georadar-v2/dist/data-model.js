@@ -2,7 +2,8 @@
   'use strict';
   const statuses={existing:{label:'Bestandskunde',color:'#2387ec'},prospect:{label:'Potenzieller Neukunde',color:'#ffffff'},priority:{label:'Besonders interessant',color:'#e0444e'},unknown:{label:'Status ungeklärt',color:'#788592'}};
   const aliases={Bestandskunde:'existing',Bestandskunden:'existing',Neukunde:'prospect',Neukunden:'prospect','Potenzieller Neukunde':'prospect','Besonders interessant':'priority','Status ungeklärt':'unknown'};
-  const optional=['customerNumber','street','postalCode','postalPrefix','city','state','district','industry','product','potential','contact','notes','relationships','coordinateSource','personnelNumber','salesRep'];
+  const optional=['customerNumber','street','postalCode','postalPrefix','city','state','district','industry','product','potential','contact','notes','relationships','coordinateSource','personnelNumber','salesRep','reason','opportunity'];
+  function webUrl(value){if(typeof value!=='string'||value.length>2000)throw Error('Quellen-/Website-URL muss Text mit höchstens 2.000 Zeichen sein.');let u;try{u=new URL(value);}catch{}if(!u||!['http:','https:'].includes(u.protocol)||u.username||u.password)throw Error('Nur http/https-URLs ohne eingebettete Zugangsdaten sind erlaubt.');return u.href;}
   function position(r){
     if(Number.isFinite(r.lon)&&Number.isFinite(r.lat))return {coordinates:[r.lon,r.lat],isPrefix:false};
     const prefix=r.postalPrefix||(/^\d{2}$/.test(r.postalCode||'')?r.postalCode:undefined);
@@ -33,6 +34,9 @@
         const status=raw.status??raw.category??'unknown';r.status=aliases[status]||status;
         if(!Object.hasOwn(statuses,r.status))throw Error('Unbekannter Kundenstatus.');
         for(const field of optional){if(raw[field]===undefined||raw[field]===null)continue;if(typeof raw[field]!=='string'||raw[field].length>4000)throw Error(field+' muss Text mit höchstens 4.000 Zeichen sein.');r[field]=raw[field].trim();}
+        if(raw.website!==undefined&&raw.website!=='')r.website=webUrl(raw.website);
+        for(const field of ['isFictional','needsReview'])if(raw[field]!==undefined){if(typeof raw[field]!=='boolean')throw Error(field+' muss true oder false sein.');r[field]=raw[field];}
+        if(raw.sources!==undefined){if(!Array.isArray(raw.sources)||raw.sources.length>20)throw Error('sources muss eine Liste mit höchstens 20 Quellen sein.');r.sources=raw.sources.map(s=>{if(!s||typeof s!=='object'||Array.isArray(s))throw Error('Quelle benötigt url und optional title.');const source={url:webUrl(s.url)};if(s.title!==undefined){if(typeof s.title!=='string'||s.title.length>300)throw Error('Quellentitel ist zu lang.');source.title=s.title.trim();}return source;});}
         if(r.postalCode&&!((r.country==='Deutschland'?/^(?:\d{2}|\d{5})$/:/^(?:\d{2}|\d{4})$/).test(r.postalCode)))throw Error('PLZ muss vollständig oder als zweistelliges Präfix als Text übergeben werden.');
         if(r.postalCode?.length===2){if(r.postalPrefix&&r.postalPrefix!==r.postalCode)throw Error('PLZ und PLZ-Präfix widersprechen sich.');r.postalPrefix=r.postalCode;}
         if(r.postalPrefix&&!/^\d{2}$/.test(r.postalPrefix))throw Error('postalPrefix muss aus genau zwei Ziffern bestehen.');

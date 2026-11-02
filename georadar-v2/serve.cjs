@@ -1,12 +1,22 @@
-const http=require('node:http');
-const fs=require('node:fs');
-const path=require('node:path');
+'use strict';
+const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
+const {createResearchApi}=require('./backend/research-api.cjs'),{createStore}=require('./backend/research-store.cjs');
+const {createTransport}=require('./mcp/transport.cjs'),{handle}=require('./mcp/server.cjs');
 const root=path.resolve(__dirname,'dist');
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.txt':'text/plain; charset=utf-8'};
-http.createServer((req,res)=>{
-  let pathname;
-  try{pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);}catch{res.writeHead(400).end();return;}
-  const filename=path.resolve(root,'.'+(pathname==='/'?'/index.html':pathname));
+function createPreviewServer({store=createStore(),getToken=()=>process.env.GEORADAR_TOKEN}={}){
+ const api=createResearchApi({store,getToken}),mcp=createTransport({getToken,dispatch:m=>handle(m,{store})});
+ return http.createServer(async(req,res)=>{
+  let pathname,url;try{url=new URL(req.url,'http://'+req.headers.host);pathname=decodeURIComponent(url.pathname);}catch{res.writeHead(400).end();return;}
+  if(pathname==='/api/research'||pathname==='/mcp'){
+   try{const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>2*1024*1024){res.writeHead(413).end();return;}chunks.push(chunk);}const request=new Request(url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body:Buffer.concat(chunks)}:{})});const response=await (pathname==='/mcp'?mcp:api)(request);res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));}catch{if(!res.headersSent)res.writeHead(500);res.end();}return;
+  }
+  const view=/^\/[A-Za-z][A-Za-z0-9-]{2,31}\/?$/.test(pathname)&&!['API','MCP','ASSETS','DIST','LICENSES','STATIC'].includes(pathname.replace(/\//g,'').toUpperCase());
+  if(view&&pathname.endsWith('/')){res.writeHead(308,{Location:pathname.slice(0,-1)+url.search}).end();return;}
+  const filename=path.resolve(root,'.'+(pathname==='/'||view?'/index.html':pathname));
   if(!filename.startsWith(root+path.sep)){res.writeHead(403).end();return;}
-  fs.readFile(filename,(err,data)=>{if(err){res.writeHead(404).end('Nicht gefunden');return;}res.writeHead(200,{'Content-Type':mime[path.extname(filename)]||'application/octet-stream','X-Content-Type-Options':'nosniff'});res.end(data);});
-}).listen(4387,'127.0.0.1',()=>console.log('Local: http://127.0.0.1:4387'));
+  fs.readFile(filename,(err,data)=>{if(err){res.writeHead(404).end('Nicht gefunden');return;}res.writeHead(200,{'Content-Type':mime[path.extname(filename)]||'application/octet-stream','X-Content-Type-Options':'nosniff',...(view?{'X-Robots-Tag':'noindex, nofollow','Cache-Control':'no-store'}:{})});res.end(data);});
+ });
+}
+if(require.main===module)createPreviewServer().listen(Number(process.env.PORT||4387),'127.0.0.1',()=>console.log('Local: http://127.0.0.1:'+(process.env.PORT||4387)));
+module.exports={createPreviewServer};

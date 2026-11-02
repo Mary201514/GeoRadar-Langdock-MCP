@@ -1,0 +1,87 @@
+{
+  "code": "AB382",
+  "title": "Fiktiver GeoRadar-Test Deutschland und Österreich",
+  "research": {
+    "mode": "dummy",
+    "query": "Technischer Test ohne echte Firmen und ohne ERP",
+    "generatedAt": "2026-11-02T12:00:00Z"
+  },
+  "records": [
+    {
+      "id": "DUMMY-0",
+      "name": "Fiktive Testfirma 0",
+      "country": "DE",
+      "lon": 9.99,
+      "lat": 53.55,
+      "locationAccuracy": "approximate",
+      "status": "existing",
+      "isFictional": true,
+      "needsReview": true,
+      "website": "https://example.invalid/dummy/0",
+      "sources": [
+        {
+          "url": "https://example.invalid/dummy/source/0",
+          "title": "Fiktive Testquelle, kein Nachweis zu einer realen Firma"
+        }
+      ],
+      "reason": "Ausschließlich synthetischer Funktionstest."
+    },
+    {
+      "id": "DUMMY-1",
+      "name": "Fiktive Testfirma 1",
+      "country": "DE",
+      "lon": 13.405,
+      "lat": 52.52,
+      "locationAccuracy": "approximate",
+      "status": "prospect",
+      "isFictional": true,
+      "needsReview": true,
+      "website": "https://example.invalid/dummy/1",
+      "sources": [
+        {
+          "url": "https://example.invalid/dummy/source/1",
+          "title": "Fiktive Testquelle, kein Nachweis zu einer realen Firma"
+        }
+      ],
+      "reason": "Ausschließlich synthetischer Funktionstest."
+    },
+    {
+      "id": "DUMMY-2",
+      "name": "Fiktive Testfirma 2",
+      "country": "AT",
+      "lon": 16.373,
+      "lat": 48.208,
+      "locationAccuracy": "approximate",
+      "status": "priority",
+      "isFictional": true,
+      "needsReview": true,
+      "website": "https://example.invalid/dummy/2",
+      "sources": [
+        {
+          "url": "https://example.invalid/dummy/source/2",
+          "title": "Fiktive Testquelle, kein Nachweis zu einer realen Firma"
+        }
+      ],
+      "reason": "Ausschließlich synthetischer Funktionstest."
+    },
+    {
+      "id": "DUMMY-3",
+      "name": "Fiktive Testfirma 3",
+      "country": "AT",
+      "lon": 11.404,
+      "lat": 47.269,
+      "locationAccuracy": "approximate",
+      "status": "unknown",
+      "isFictional": true,
+      "needsReview": true,
+      "website": "https://example.invalid/dummy/3",
+      "sources": [
+        {
+          "url": "https://example.invalid/dummy/source/3",
+          "title": "Fiktive Testquelle, kein Nachweis zu einer realen Firma"
+        }
+      ],
+      "reason": "Ausschließlich synthetischer Funktionstest."
+    }
+  ]
+}

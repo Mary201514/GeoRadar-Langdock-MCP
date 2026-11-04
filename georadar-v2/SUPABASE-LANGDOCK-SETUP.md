@@ -24,7 +24,9 @@ Kein Supabase-Key in Langdock, ZIP-Dateien, Browsercode oder GitHub. Kein Publis
 
 ## 2. Langdock-Integration importieren und verbinden
 
-`Mangold-GeoRadar-Supabase-Integration.zip` über den Import einer Integration einlesen. Das Format entspricht dem bereitgestellten nativen MCP-Export: manifest.json sowie action_manifest.json und leere code.js für native MCP-Aktionen. Die Serverimplementierung liegt auf Vercel, nicht in einer Custom-JavaScript-Aktion.
+Empfohlener und im Langdock-Dialog bestätigter Weg: Plugins → Erstellen → Integration → **MCP Server verbinden**. Server-URL `https://mangold-georadar.vercel.app/mcp`, API Key, Header-Typ **Authorization: Bearer**. Bei Verbindung hinzufügen nur den GEORADAR_TOKEN-Wert ohne `Bearer ` eingeben. Danach **Server-Funktionen auflisten → Alle auswählen → Speichern**. Alle drei Aktionen müssen aktiviert sein. Diese MCP-Integration dem Agenten zuweisen und den Agenten aktualisieren. Frühere Custom-Integrationen mit nur **Action 1** enthalten die benötigten Speicherwerkzeuge nicht.
+
+Die ZIP-Datei `Mangold-GeoRadar-Supabase-Integration.zip` bleibt als strukturell geprüfte Exportvorlage enthalten. Ihr Import hat in der beobachteten Langdock-Oberfläche jedoch eine Custom-Integration mit Authentifizierung None statt der vorgesehenen MCP-Verbindung ergeben. Den ZIP-Import deshalb nicht als bestätigten Einrichtungsweg behandeln. Die Serverimplementierung liegt auf Vercel.
 
 Name: **Mangold GeoRadar – Supabase**. URL `https://mangold-georadar.vercel.app/mcp`, Transport **Streamable HTTP**, Authentifizierung **Authorization: Bearer** mit dem vorhandenen `GEORADAR_TOKEN`. Den Wert nur im geschützten Verbindungsfeld eintragen. Wenn Langdock den Präfix selbst setzt, nur den Schlüsselwert eingeben.
 
@@ -52,7 +54,7 @@ Vor echten öffentlichen/vertriebsinternen Kundendaten muss zuerst ein eigener a
 
 `node test/check-research-browser.cjs`: lokaler vollständiger Ablauf über HTTP-MCP → Supabase-Testadapter → `/AB382` → echter Chrome/MapLibre mit vier sichtbaren Markern (blau/weiß/rot/grau). Alle Quellen und Dummy-Kennzeichnungen bleiben erhalten.
 
-Die Simulation ist ausdrücklich kein Live-Supabase-Test und kein bestätigter Langdock-Import. Echte Migration, serverseitige Supabase-Konfiguration sowie der tatsächliche Langdock-Import/Verbindungsaufruf müssen gesondert bestätigt werden. Keine echten Speichererfolge behaupten, bevor diese Schritte ausgeführt und geprüft sind.
+Die lokalen Simulationen sind kein Live-Supabase-Test. Zusätzlich wurde am 04.11.2026 die echte Datenbank und die Produktionskarte getestet, siehe Veröffentlichung dieses Stands. Keine ungeprüften Speichererfolge aus Langdock behaupten.
 
 ## Quellen
 
@@ -62,4 +64,10 @@ https://docs.langdock.com/en/using-langdock/guides/integrations/mcp/mcp
 
 ## Veröffentlichung dieses Stands
 
-Auf Vercel veröffentlicht: Produktions-Karte und /AB382 liefern HTTP 200; POST /mcp und POST /api/research ohne Bearer liefern 401; GET /api/research ohne Kennung liefert 400. Der Datenbankabruf liefert derzeit 503 STORAGE_NOT_CONFIGURED. Das bestätigt die fehlende Supabase-Konfiguration und ist kein erfolgreicher Live-Speichertest. Die Importdateien sind strukturell gegen die bereitgestellten Exporte geprüft; ein tatsächlicher Langdock-Import und die Workspace-Aktionszuordnung sind noch offen.
+Stand 04.11.2026: Supabase-Projekt `vljhiyxgcbfjyytopxnl` ist aktiv. Die Tabelle wurde per Migration angelegt; RLS ist aktiv. Anon und authenticated haben weder SELECT noch INSERT; service_role hat SELECT und INSERT, aber kein UPDATE oder DELETE. Ein Schreib-/Lesetest unter service_role wurde zurückgerollt. Vier ausdrücklich fiktive Unternehmen wurden separat unter AB382 per SQL gespeichert.
+
+Die unveränderte App wurde nach Hinterlegung der Production-Variablen auf Vercel neu bereitgestellt: Deployment `dpl_7qWFXTWSYD577P7HrPmhqRXfqcox`, Status READY. Produktions-Karte und /AB382 liefern HTTP 200; GET /api/research?code=AB382 liefert die vier Datensätze aus der echten Supabase-Datenbank. POST /mcp und POST /api/research ohne Bearer liefern 401; GET /api/research ohne Kennung liefert 400. Im echten Chrome-Browser laden Basiskarte und vier Firmenmarker mit Blau/Weiß/Rot/Grau ohne JavaScript-Fehler.
+
+Benutzerscreenshot bestätigt: Langdock authentifiziert sich erfolgreich und entdeckt save_georadar_research, load_georadar_research sowie show_georadar_map. Die Aktivierungshaken waren im letzten Screenshot noch leer. Aktivieren, Speichern, Zuweisung der richtigen MCP-Integration zum Agenten und dessen Veröffentlichung bleiben Benutzeraktionen. Eine erfolgreiche MCP-Speicherung aus Langdock und die Darstellung im eingebetteten Langdock-Chat sind weiterhin nicht bestätigt. Der Testdatensatz AB382 wurde per SQL, nicht durch einen Langdock-Aufruf angelegt. Für einen neuen Speichertest eine freie Kennung wie AB383 nutzen.
+
+Der aktuelle Karten-Prompt ist in `langdock/KARTEN-PROMPT.txt` gesichert. Er muss im Langdock-Agenten eingefügt und über Aktualisieren veröffentlicht werden; eine lokale Sicherung bestätigt keine Änderung im Langdock-Konto. Keine Secret-Werte sind Teil dieser Sicherung.

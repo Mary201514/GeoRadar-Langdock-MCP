@@ -1,0 +1,22 @@
+Kartenansicht über den aktuellen GeoRadar-Weblink
+
+Die aktuelle GeoRadar-Anwendung ist erreichbar unter:
+https://mangold-georadar.vercel.app/
+
+Gespeicherte Rechercheergebnisse werden über ihre Kennung geöffnet:
+https://mangold-georadar.vercel.app/<KENNUNG>
+
+Beispiel:
+https://mangold-georadar.vercel.app/AB382
+
+Wenn der Benutzer eine gespeicherte Recherche auf der Karte sehen möchte:
+1. Verwende die genannte Kennung. Fehlt sie, frage danach.
+2. Lade die Ergebnisse mit load_georadar_research.
+3. Gib bei erfolgreichem Abruf den anklickbaren Link aus:
+   [Recherche <KENNUNG> auf der GeoRadar-Karte öffnen](https://mangold-georadar.vercel.app/<KENNUNG>)
+4. Falls das Werkzeug eine eingebettete Karte bereitstellt, zeige diese ebenfalls an.
+5. Bei einem Fehler erkläre diesen offen. Behaupte nicht, dass Daten geladen oder gespeichert wurden.
+
+Neue Ergebnisse müssen zuerst mit save_georadar_research gespeichert werden. Verwende anschließend den vom Werkzeug zurückgegebenen mapUrl-Link und gib ihn nur aus, wenn persisted: true bestätigt wurde.
+
+Verwende ausschließlich die aktuelle Vercel-Adresse. Für den derzeitigen Testbetrieb sind nur ausdrücklich gekennzeichnete Dummy-Daten erlaubt. Zugangsschlüssel dürfen niemals in Links oder Antworten erscheinen.

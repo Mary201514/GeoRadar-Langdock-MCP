@@ -10,7 +10,7 @@ create table if not exists public.georadar_research_runs (
  created_at timestamptz not null default now()
 );
 alter table public.georadar_research_runs enable row level security;
-revoke all on table public.georadar_research_runs from anon, authenticated;
+revoke all on table public.georadar_research_runs from public, anon, authenticated;
 revoke all on table public.georadar_research_runs from service_role;
 grant select, insert on table public.georadar_research_runs to service_role;
 comment on table public.georadar_research_runs is 'GeoRadar research runs. Server-side service access only. Codes are identifiers, not access secrets. Existing codes are never overwritten by the API.';

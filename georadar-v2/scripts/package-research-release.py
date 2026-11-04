@@ -25,11 +25,15 @@ with zipfile.ZipFile(out/'Mangold-GeoRadar-Supabase-Integration.zip') as z:
     assert any('/map-v4.html/' in n for n in z.namelist())
 guide=(root/'SUPABASE-LANGDOCK-SETUP.md').read_bytes()
 (out/'README-EINRICHTUNG.md').write_bytes(guide)
-report={'importFormatChecks':'passed against supplied native export structures','credentialsIncluded':False,'workspaceActionBinding':'required after import; original agent export had actions=[]','technicalTests':'9 Supabase contract-double tests and real Chrome full local pipeline passed; core, transport, bridge and PLZ tests passed','liveSupabase':'not confirmed yet','actualLangdockImport':'not confirmed yet'}
+(out/'Supabase-Tabelle-anlegen.sql').write_bytes((root/'supabase/migrations/20261102_georadar_research_runs.sql').read_bytes())
+(out/'KARTEN-PROMPT.txt').write_bytes((root/'langdock/KARTEN-PROMPT.txt').read_bytes())
+report={'importFormatChecks':'structural checks passed; ZIP import did not configure MCP correctly in observed Langdock UI; use direct MCP connection','credentialsIncluded':False,'workspaceActionBinding':'activate all three discovered actions, save MCP configuration, assign correct integration to agent and publish','technicalTests':'9 Supabase contract-double tests and real Chrome full local pipeline passed; core, transport, bridge and PLZ tests passed','liveSupabase':'confirmed: schema, restricted permissions, SQL write/read and Vercel REST read; four dummy markers in production Chrome','langdockDiscovery':'confirmed by user screenshot: authentication and all three tools discovered; activation checkboxes were still unchecked','langdockMcpWrite':'not yet confirmed','langdockEmbeddedMap':'not yet confirmed'}
 live_report=root/'verification/research-production-readiness.json'
 if live_report.exists():report['vercelReadiness']=json.loads(live_report.read_text(encoding='utf-8'))
+browser_report=root/'verification/live-supabase-browser.json'
+if browser_report.exists():report['productionBrowser']=json.loads(browser_report.read_text(encoding='utf-8'))
 (out/'TESTSTATUS.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-source_names=['serve.cjs','vercel.json','.env.example','.gitignore','SUPABASE-LANGDOCK-SETUP.md']
+source_names=['serve.cjs','vercel.json','.env.example','.gitignore','README.md','SUPABASE-LANGDOCK-SETUP.md']
 for folder in ['api','backend','dist','mcp','supabase','test','scripts','langdock']:
     for p in (root/folder).rglob('*'):
         if p.is_file() and '__pycache__' not in p.parts and p.name not in ['map.html']:
@@ -38,7 +42,7 @@ for name in source_names:
     assert not any(part in ('.git','.vercel','node_modules') for part in pathlib.PurePosixPath(name).parts)
     assert not pathlib.PurePosixPath(name).name.startswith('.env') or name=='.env.example'
     p=root/name
-    if p.suffix in ('.js','.cjs','.mjs','.json','.md','.py','.sql'):
+    if p.suffix in ('.js','.cjs','.mjs','.json','.md','.py','.sql','.txt'):
         text=p.read_text(encoding='utf-8')
         assert not re.search(r'sb_secret_[A-Za-z0-9_-]{24,}',text), 'Secret-like value in '+name
         assert not re.search(r'\beyJ[A-Za-z0-9_-]{25,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}',text), 'JWT-like value in '+name

@@ -132,7 +132,7 @@
       let rawStyle=window.GEORADAR_STYLE;
       if(!rawStyle){const response=await fetch('base-style.json',{signal:AbortSignal.timeout(15000)});if(!response.ok)throw new Error('Kartenstil nicht verfügbar');rawStyle=await response.json();}
       const style=styleMap(rawStyle);
-      map=new maplibregl.Map({container:'map',style,center:[11.5,50.7],zoom:4,minZoom:2,maxZoom:18,maxPitch:0,dragRotate:false,touchPitch:false,renderWorldCopies:false,attributionControl:false,keyboard:true});
+      map=new maplibregl.Map({container:'map',preserveDrawingBuffer:true,style,center:[11.5,50.7],zoom:4,minZoom:2,maxZoom:18,maxPitch:0,dragRotate:false,touchPitch:false,renderWorldCopies:false,attributionControl:false,keyboard:true});
       map.touchZoomRotate.disableRotation();
       map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
       map.addControl(new maplibregl.ScaleControl({unit:'metric',maxWidth:110}),'bottom-left');

@@ -11,7 +11,7 @@
    const response=await fetch('/api/research?code='+encodeURIComponent(code),{headers:{Accept:'application/json'},credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000)});
    const body=await response.json();if(!response.ok)throw Error(body.message||'Recherche konnte nicht geladen werden.');
    if(body.code!==code||body.persisted!==true)throw Error('Unerwartete Rechercheantwort.');
-   const data=window.GeoRadarData.validate(body.data);document.dispatchEvent(new CustomEvent('georadar:research-loaded',{detail:{code,data}}));
+   const data=window.GeoRadarData.validate(body.data);window.GeoRadarResearchSource={code:body.code,createdAt:body.createdAt};document.dispatchEvent(new CustomEvent('georadar:research-loaded',{detail:{code,data}}));
    status.textContent='Supabase · '+code+' · '+data.records.length+' Unternehmen geladen';
    notice.textContent=body.title+' · Gespeichert: '+new Date(body.createdAt).toLocaleString('de-DE')+' · Ausschließlich fiktive Testdaten';
    document.title='GeoRadar · '+code+' · '+body.title;

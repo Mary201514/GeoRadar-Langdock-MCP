@@ -5,7 +5,7 @@ function bundle(){
   let html=fs.readFileSync(path.join(dist,'index.html'),'utf8');
   for(const name of ['maplibre-gl.css','style.css'])html=html.replace('<link rel="stylesheet" href="'+name+'">',()=>'<style>'+fs.readFileSync(path.join(dist,name),'utf8').replace(/<\/style/gi,'<\\/style')+'</style>');
   const scripts=[];
-  for(const name of ['maplibre-gl.js','context-mask.js','postal-prefixes.js','representatives.js','data-model.js','xlsx.mini.min.js','company-import.js','companies.js','territories.js','mcp-bridge.js','saved-research.js','app.js']){
+  for(const name of ['maplibre-gl.js','context-mask.js','postal-prefixes.js','representatives.js','data-model.js','xlsx.mini.min.js','company-import.js','analysis-model.js','view-model.js','companies.js','territories.js','analysis-ui.js','saved-views.js','mcp-bridge.js','saved-research.js','app.js']){
     html=html.replace('<script defer src="'+name+'"></script>','');
     const source=name==='mcp-bridge.js'?path.join(__dirname,'app-bridge.js'):path.join(dist,name);
     scripts.push('<script>'+fs.readFileSync(source,'utf8').replace(/<\/script/gi,'<\\/script')+'</script>');

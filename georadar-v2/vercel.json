@@ -12,6 +12,14 @@
     "api/research.mjs": {
       "includeFiles": "{dist/**,backend/**}",
       "maxDuration": 30
+    },
+    "api/auth.mjs": {
+      "includeFiles": "{dist/**,backend/**}",
+      "maxDuration": 30
+    },
+    "api/views.mjs": {
+      "includeFiles": "{dist/**,backend/**}",
+      "maxDuration": 30
     }
   },
   "rewrites": [

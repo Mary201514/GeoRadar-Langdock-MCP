@@ -12,6 +12,14 @@
     "api/research.mjs": {
       "includeFiles": "georadar-v2/{dist/**,backend/**}",
       "maxDuration": 30
+    },
+    "api/auth.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,backend/**}",
+      "maxDuration": 30
+    },
+    "api/views.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,backend/**}",
+      "maxDuration": 30
     }
   },
   "rewrites": [

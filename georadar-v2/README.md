@@ -1,4 +1,5 @@
-# MANGOLD GEORADAR — GK-10-Teststand
+<!-- Bestehendes Projekt, keine neue Anwendung. Keine Produktionsfreigabe. -->
+# MANGOLD GEORADAR 3.0 — Preview
 
 MapLibre-Karte für Deutschland und Österreich mit Unternehmensmarkern, Clustering, Statusfiltern, validierter JSON-Übergabe und MCP-App-Anschluss. Ergänzt: eigener Mangold-Standort, PLZ-Präfixfilter und Außendienstzuordnung CO=93, SR=42, SH=11, GD=2, GK=10. Neu im Test-Branch: Vertreter-Mehrfachauswahl, fünf Ringfarben, GK-Fachvorschläge und CSV-/Excel-.xlsx-Import. Noch kein DEM/3D oder mitgelieferter vollständiger PLZ-Polygon-Datensatz.
 
@@ -103,3 +104,8 @@ Der neue Adapter api/mcp.mjs stellt denselben MCP-Kern serverlos unter /mcp bere
 ## GK 10 – isolierter Teststand
 
 Details, Änderungen, Importgrenzen und Tests stehen in `GK10-TESTSTAND.md`. Dieser Branch wurde nicht produktiv veröffentlicht. Bestehende MCP-Adressen, Authentifizierung und Supabase-Verbindungen sind unverändert.
+
+
+## GeoRadar 3.0 – Analyse und private Speicherung
+
+Die vollständige Bestandsaufnahme, Zuständigkeiten, verfügbaren Auswertungen, neuen Export-/Speicherfunktionen, Konfiguration, Datenschutzgrenzen und Tests stehen in `GEORADAR-3-PREVIEW.md`. Die Preview ist kein Produktiv-Release.

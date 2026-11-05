@@ -1,6 +1,6 @@
-# MANGOLD GEORADAR 3D — Version 2
+# MANGOLD GEORADAR — GK-10-Teststand
 
-MapLibre-Karte für Deutschland und Österreich mit Unternehmensmarkern, Clustering, Statusfiltern, validierter JSON-Übergabe und MCP-App-Anschluss. Ergänzt: eigener Mangold-Standort, PLZ-Präfixfilter und Außendienstzuordnung CO=93, SR=42, SH=11, GD=2. Noch kein DEM/3D, Excel-Import oder mitgelieferter vollständiger PLZ-Polygon-Datensatz.
+MapLibre-Karte für Deutschland und Österreich mit Unternehmensmarkern, Clustering, Statusfiltern, validierter JSON-Übergabe und MCP-App-Anschluss. Ergänzt: eigener Mangold-Standort, PLZ-Präfixfilter und Außendienstzuordnung CO=93, SR=42, SH=11, GD=2, GK=10. Neu im Test-Branch: Vertreter-Mehrfachauswahl, fünf Ringfarben, GK-Fachvorschläge und CSV-/Excel-.xlsx-Import. Noch kein DEM/3D oder mitgelieferter vollständiger PLZ-Polygon-Datensatz.
 
 ## Start
 
@@ -28,7 +28,8 @@ Unter „JSON-Daten übernehmen“ Datei auswählen oder JSON einfügen. Jede er
     {"code":"CO","personnelNumber":"93","rules":[]},
     {"code":"SR","personnelNumber":"42","rules":[]},
     {"code":"SH","personnelNumber":"11","rules":[]},
-    {"code":"GD","personnelNumber":"2","rules":[]}
+    {"code":"GD","personnelNumber":"2","rules":[]},
+    {"code":"GK","personnelNumber":"10","rules":[]}
   ]
 }
 ```
@@ -48,9 +49,9 @@ Maximal 10.000 Firmen. Browserimport maximal 5 MB; MCP-Anfrage maximal 6 MB inkl
 
 ## PLZ und Außendienst
 
-Vom Auftraggeber festgelegt: CO=93, SR=42, SH=11, GD=2. PLZ-Gebiete zunächst leer. Unter „PLZ & Außendienst“ je Kürzel Personalnummer und Präfixlisten je Land eintragen und übernehmen. Eine Regel hat die Form `{"country":"DE","prefixes":["…"]}` bzw. AT. Präfixe sind numerische Texte, DE 1–5/AT 1–4 Ziffern. Platzhalter in Eingabefeldern sind keine gespeicherten Gebietszuordnungen.
+Vom Auftraggeber festgelegt: CO=93, SR=42, SH=11, GD=2, GK=10. PLZ-Gebiete zunächst leer. Unter „PLZ & Außendienst“ je Kürzel Personalnummer und Präfixlisten je Land eintragen und übernehmen. Eine Regel hat die Form `{"country":"DE","prefixes":["…"]}` bzw. AT. Präfixe sind numerische Texte, DE 1–5/AT 1–4 Ziffern. Platzhalter in Eingabefeldern sind keine gespeicherten Gebietszuordnungen.
 
-Ein Unternehmen gehört zum Gebiet, wenn seine explizite Personalnummer passt, salesRep dem Kürzel entspricht oder seine landesspezifische PLZ zu einer Regel passt. Mehrfachtreffer bleiben sichtbar; es gibt keine automatische Vorrangentscheidung. Die vier Gebiete sind als Markierungsringe/Bezeichnungen separat ein-/ausblendbar. Ein zusätzlicher Gebietsfilter filtert die Firmenliste. Markerfüllungen behalten die Statusfarben.
+Explizite Vertreterangaben haben Vorrang und werden nie durch PLZ-Regeln ersetzt. Ohne Vertreterangabe gilt die Personalnummer; nur ohne beide Angaben greifen importierte PLZ-Regeln. GK ist fachlich für alle PLZ-Gebiete verfügbar; daraus entsteht keine automatische Kundenzuordnung. Die fünf Gebiete sind als Markierungsringe/Bezeichnungen separat ein-/ausblendbar. Ein zusätzlicher Gebietsfilter filtert die Firmenliste. Markerfüllungen behalten die Statusfarben.
 
 Der freie PLZ-Filter unterstützt z.B. `88, 89, 78, 88046, 6850`. Er filtert vorhandene Firmen; ohne Daten ist er kein vollständiges PLZ-Verzeichnis. PLZ-Beschriftungen stehen an vorhandenen Standorten, nicht an erfundenen PLZ-Zentroiden.
 
@@ -97,3 +98,8 @@ Darstellung der Nachbarländer: blasse Kontextmaske in Übersichtszooms auf Basi
 ## MCP auf Vercel
 
 Der neue Adapter api/mcp.mjs stellt denselben MCP-Kern serverlos unter /mcp bereit. Karte und dist-Dateien bleiben unverändert. Vercel Production benötigt GEORADAR_TOKEN als Secret; ohne gültige Konfiguration bleibt der Endpunkt geschlossen. Einrichtung, zusätzliche Vercel-Zugriffsschutzebene und Tests: [LANGDOCK-VERCEL.md](LANGDOCK-VERCEL.md).
+
+
+## GK 10 – isolierter Teststand
+
+Details, Änderungen, Importgrenzen und Tests stehen in `GK10-TESTSTAND.md`. Dieser Branch wurde nicht produktiv veröffentlicht. Bestehende MCP-Adressen, Authentifizierung und Supabase-Verbindungen sind unverändert.

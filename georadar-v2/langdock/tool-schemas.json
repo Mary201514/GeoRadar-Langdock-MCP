@@ -202,8 +202,8 @@
         },
         "territories": {
           "type": "array",
-          "maxItems": 4,
-          "description": "Optionale vollständige Gebietszuordnung. Ohne Angabe bleiben die aktuellen Gebiete bestehen. Standard-Personalnummern CO=93, SR=42, SH=11, GD=2; PLZ noch nicht zugeordnet.",
+          "maxItems": 5,
+          "description": "Optionale vollständige Gebietszuordnung. Ohne Angabe bleiben die aktuellen Gebiete bestehen. Standard-Personalnummern CO=93, SR=42, SH=11, GD=2, GK=10; PLZ noch nicht zugeordnet.",
           "items": {
             "type": "object",
             "required": [
@@ -217,7 +217,8 @@
                   "CO",
                   "SR",
                   "SH",
-                  "GD"
+                  "GD",
+                  "GK"
                 ]
               },
               "personnelNumber": {
@@ -473,8 +474,8 @@
         },
         "territories": {
           "type": "array",
-          "maxItems": 4,
-          "description": "Optionale vollständige Gebietszuordnung. Ohne Angabe bleiben die aktuellen Gebiete bestehen. Standard-Personalnummern CO=93, SR=42, SH=11, GD=2; PLZ noch nicht zugeordnet.",
+          "maxItems": 5,
+          "description": "Optionale vollständige Gebietszuordnung. Ohne Angabe bleiben die aktuellen Gebiete bestehen. Standard-Personalnummern CO=93, SR=42, SH=11, GD=2, GK=10; PLZ noch nicht zugeordnet.",
           "items": {
             "type": "object",
             "required": [
@@ -488,7 +489,8 @@
                   "CO",
                   "SR",
                   "SH",
-                  "GD"
+                  "GD",
+                  "GK"
                 ]
               },
               "personnelNumber": {

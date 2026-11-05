@@ -1,0 +1,76 @@
+{
+  "schema": "mangold-georadar/companies/v1",
+  "records": [
+    {
+      "id": "DUMMY-CO",
+      "name": "Fiktive Testfirma CO",
+      "country": "DE",
+      "lon": 9.99,
+      "lat": 53.55,
+      "salesRep": "CO 93",
+      "personnelNumber": "93",
+      "status": "existing",
+      "isFictional": true,
+      "locationAccuracy": "approximate"
+    },
+    {
+      "id": "DUMMY-SR",
+      "name": "Fiktive Testfirma SR",
+      "country": "DE",
+      "lon": 13.405,
+      "lat": 52.52,
+      "salesRep": "SR 42",
+      "personnelNumber": "42",
+      "status": "prospect",
+      "isFictional": true,
+      "locationAccuracy": "approximate"
+    },
+    {
+      "id": "DUMMY-SH",
+      "name": "Fiktive Testfirma SH",
+      "country": "AT",
+      "lon": 16.373,
+      "lat": 48.208,
+      "salesRep": "SH 11",
+      "personnelNumber": "11",
+      "status": "priority",
+      "isFictional": true,
+      "locationAccuracy": "approximate"
+    },
+    {
+      "id": "DUMMY-GD",
+      "name": "Fiktive Testfirma GD",
+      "country": "AT",
+      "lon": 11.404,
+      "lat": 47.269,
+      "salesRep": "GD 2",
+      "personnelNumber": "2",
+      "status": "unknown",
+      "isFictional": true,
+      "locationAccuracy": "approximate"
+    },
+    {
+      "id": "DUMMY-GK",
+      "name": "Fiktive Testfirma GK",
+      "country": "DE",
+      "lon": 9.18,
+      "lat": 48.78,
+      "salesRep": "GK 10",
+      "personnelNumber": "10",
+      "status": "priority",
+      "isFictional": true,
+      "locationAccuracy": "approximate"
+    },
+    {
+      "id": "DUMMY-NONE",
+      "name": "Fiktiver Pumpen-Lead ohne Vertreter",
+      "country": "DE",
+      "lon": 7,
+      "lat": 50,
+      "status": "prospect",
+      "product": "Pumpen",
+      "isFictional": true,
+      "locationAccuracy": "approximate"
+    }
+  ]
+}

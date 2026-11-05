@@ -37,6 +37,8 @@ original_instruction = agent['instruction']
 integration = read_template('georadar-langdock.zip')
 agent.update(id=ids['agent'], name='Mangold LeadRadar – GeoRadar Speicher', description='Recherchiert strukturierte B2B-Ergebnisse und speichert sie unter einer selbst gewählten Kennung in Supabase. Öffentliche Links zunächst nur für Dummy-Daten.', subagents=[], actions=[], imageGeneration=False, creativity=0.2, webSearch=True)
 for f in agent['inputFields']:
+    if f['slug'] == 'vertreter' and 'GK 10' not in f['options']:
+        f['options'].insert(f['options'].index('Nicht zugeordnet'), 'GK 10')
     if f['slug'] == 'Zielbranchen__optional_': f['slug'] = 'industries'
     f['order'] += 3
     if f['slug'] == 'neukunden_anzahl':
@@ -63,7 +65,7 @@ Ein einzelner Suchparameter reicht. Ohne Suchparameter im B2B-Modus zuerst frage
 ## Recherchequalität
 Nur B2B-Unternehmen; Privatpersonen und Privatkunden ausschließen. Im B2B-Modus vor jeder Recherche https://www.mangoldgmbh.com/ lesen und nur belegte Produkte/Leistungen für die Bewertung verwenden. Unternehmenswebsites, öffentliche Registerangaben und seriöse Branchenquellen verwenden, Nutzungsbedingungen beachten. Bei jedem Treffer Quellen-URLs übergeben; ungesicherte Informationen als needsReview=true und mit Hinweis kennzeichnen. Keine Quellen, Umsätze, Firmenstandorte oder Koordinaten erfinden. Ansprechpartner und personenbezogene Kontaktdaten standardmäßig weglassen.
 Bestandsabgleich nur bei tatsächlich bereitgestellter Kundenliste. Bestehende Kunden nur aus belastbarem Abgleich, nicht aus Vermutung als existing kennzeichnen. Ohne Liste Abgleich offen als nicht durchgeführt nennen. A-/B-/C-Kunden und Key-Accounts sind Bestand. Kundenstatus-Auswahl respektieren; ehemalige Kunden separat kenntlich machen. Kein ERP-Zugriff und kein automatischer ERP-Import.
-Vertreter CO=93, SR=42, SH=11, GD=2 nur nach bereitgestellter Zuordnung übernehmen, nicht aus Geografie erraten. Ohne Zuordnung weglassen. Verflechtungen nur mit Quellen, sonst zu prüfen.
+Vertreter CO=93, SR=42, SH=11, GD=2, GK=10 nur nach bereitgestellter Zuordnung übernehmen, nicht aus Geografie erraten. Ohne Zuordnung weglassen. GK 10: fachlich Pumpen, Rührwerke, Kläranlagen, Kommunen und Bäderbetriebe in allen PLZ-Gebieten; nur als Vorschlag für neue unzugeordnete Leads nennen, keine Zuordnung setzen oder überschreiben. Verflechtungen nur mit Quellen, sonst zu prüfen.
 Bewertung 0–100: Branchenpassung bis 25, Region bis 25, Produktpassung bis 30, belegte Ähnlichkeit zu A-Kunden bis 20. Fehlende Belege bringen keine erfundenen Punkte. Weniger belegte Treffer liefern, wenn die gewünschte Zahl nicht erreicht wird.
 
 ## Einheitliches Datenmodell

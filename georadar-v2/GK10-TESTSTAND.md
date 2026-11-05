@@ -58,3 +58,5 @@ Deployment: dpl_3tBuUSBRFZSbt4wg3u6jdFCtz9H8 (READY; Preview, kein Production-Ta
 App-Code-Commit: cc6f3c619175edfb67e0c30d3cd5efd6af9fc811. Die Produktionsadresse zeigt weiterhin das vorherige Deployment dpl_7qWFXTWSYD577P7HrPmhqRXfqcox.
 
 Die Vorschau startet ohne automatisch geladene Firmen. Über Datei / JSON übernehmen die Datei test/gk10-dummy.json importieren: fünf Vertreter und ein unzugeordneter Pumpen-Lead. Für Vercel Deployment Protection kann die Anmeldung am vorhandenen Vercel-Konto nötig sein. Es wurden keine Supabase-Secrets für Preview hinterlegt; der Abruf gespeicherter Recherchen ist dort nicht Teil dieser Prüfung.
+
+Zusatzprüfung: `node mcp/check-embedded.cjs` erfolgreich. Die gebündelte MCP-Karte lädt in einer lokalen Browser-Sandbox mit CSP alle neun angeforderten OpenFreeMap-Ressourcen, zeigt vier fiktive Firmen in den bestehenden Statusfarben und meldet keine JavaScript-Fehler. Das ist ausdrücklich keine Bestätigung der Darstellung im echten Langdock-Chat.

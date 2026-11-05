@@ -49,3 +49,12 @@ API-Handler, MCP-Transport, Authentifizierungslogik, Vercel-Konfiguration, Secre
 - Python-Syntaxprüfung scripts/build-langdock-imports.py erfolgreich.
 
 Kein allgemeiner npm-Build vorhanden: Das Projekt ist Buildless HTML/CSS/JavaScript. Screenshots und maschinenlesbarer Browsertestbericht liegen lokal unter verification/. Tatsächliche Langdock-Chatdarstellung und produktive Speicherung wurden für diesen Branch nicht getestet. Vor produktiver Veröffentlichung sind Benutzerprüfung und ausdrückliche Freigabe erforderlich.
+
+
+## Vercel-Preview
+
+URL: https://mangold-georadar-e78ksketv-mangold-maria.vercel.app
+Deployment: dpl_3tBuUSBRFZSbt4wg3u6jdFCtz9H8 (READY; Preview, kein Production-Target).
+App-Code-Commit: cc6f3c619175edfb67e0c30d3cd5efd6af9fc811. Die Produktionsadresse zeigt weiterhin das vorherige Deployment dpl_7qWFXTWSYD577P7HrPmhqRXfqcox.
+
+Die Vorschau startet ohne automatisch geladene Firmen. Über Datei / JSON übernehmen die Datei test/gk10-dummy.json importieren: fünf Vertreter und ein unzugeordneter Pumpen-Lead. Für Vercel Deployment Protection kann die Anmeldung am vorhandenen Vercel-Konto nötig sein. Es wurden keine Supabase-Secrets für Preview hinterlegt; der Abruf gespeicherter Recherchen ist dort nicht Teil dieser Prüfung.

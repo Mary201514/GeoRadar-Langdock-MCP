@@ -12,7 +12,7 @@
     if(loaded||loading)return loading;
     $('map-status').textContent='◌ PLZ-Gebiete werden geladen …';
     loading=Promise.resolve().then(()=>{
-      map.addSource('plz5',{type:'geojson',data:'/plz/plz5.geojson',promoteId:'plz',tolerance:0.45});
+      map.addSource('plz5',{type:'geojson',data:{type:'FeatureCollection',features:[]},promoteId:'plz',tolerance:0.45});
       map.addSource('plz5-labels',{type:'geojson',data:'/plz/plz5-labels.geojson'});
       const b=before();
       map.addLayer({id:'plz5-fill',type:'fill',source:'plz5',minzoom:5,paint:{'fill-color':'#2387ec','fill-opacity':['case',['>',['coalesce',['feature-state','n'],0],0],['interpolate',['linear'],['feature-state','n'],1,0.12,10,0.3,50,0.45],0.0]}},b);
@@ -26,8 +26,11 @@
         b.onclick=()=>{const s=$('company-search');if(s){s.value=plz;s.dispatchEvent(new Event('input'));}popup?.remove();};
         div.append(h,p,b);popup?.remove();popup=new maplibregl.Popup({maxWidth:'260px'}).setLngLat(e.lngLat).setDOMContent(div).addTo(map);
       });
-      const done=e=>{if(e.sourceId==='plz5'&&map.isSourceLoaded('plz5')){map.off('sourcedata',done);loaded=true;$('map-status').textContent='● PLZ-Gebiete geladen · © OpenStreetMap-Mitwirkende (ODbL)';updateCounts();}};
-      map.on('sourcedata',done);
+      Promise.all(['/plz/plz5-nord.geojson','/plz/plz5-sued.geojson'].map(u=>fetch(u).then(r=>{if(!r.ok)throw Error(u);return r.json();}))).then(parts=>{
+        map.getSource('plz5').setData({type:'FeatureCollection',features:parts.flatMap(p=>p.features)});
+        const done=()=>{if(!map.isSourceLoaded('plz5'))return;map.off('sourcedata',done);loaded=true;$('map-status').textContent='● PLZ-Gebiete geladen · © OpenStreetMap-Mitwirkende (ODbL)';updateCounts();};
+        map.on('sourcedata',done);done();
+      }).catch(()=>{$('map-status').textContent='◌ PLZ-Gebiete konnten nicht geladen werden';});
     });
     return loading;
   }

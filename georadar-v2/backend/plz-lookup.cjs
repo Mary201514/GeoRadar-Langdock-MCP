@@ -1,11 +1,11 @@
 'use strict';
-// GeoRadar 4 – ermittelt die 5-stellige PLZ zu einer Koordinate (Punkt-in-Fläche) aus dist/plz/plz5-nord.geojson und plz5-sued.geojson.
+// GeoRadar 4 – ermittelt die 5-stellige PLZ zu einer Koordinate (Punkt-in-Fläche) aus dist/plz/plz5-0.geojson bis plz5-9.geojson.
 const fs=require('node:fs'),path=require('node:path');
 
 let index=null;
 const CELL=0.25; // Raster in Grad für die Vorauswahl
 
-function load(files=['plz5-nord.geojson','plz5-sued.geojson'].map(f=>path.resolve(__dirname,'../dist/plz',f))){
+function load(files=[0,1,2,3,4,5,6,7,8,9].map(d=>'plz5-'+d+'.geojson').map(f=>path.resolve(__dirname,'../dist/plz',f))){
   if(index)return index;
   const data={features:files.flatMap(f=>JSON.parse(fs.readFileSync(f,'utf8')).features)};
   const grid=new Map(),features=[];

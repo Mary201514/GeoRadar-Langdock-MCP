@@ -26,7 +26,7 @@
         b.onclick=()=>{const s=$('company-search');if(s){s.value=plz;s.dispatchEvent(new Event('input'));}popup?.remove();};
         div.append(h,p,b);popup?.remove();popup=new maplibregl.Popup({maxWidth:'260px'}).setLngLat(e.lngLat).setDOMContent(div).addTo(map);
       });
-      Promise.all(['/plz/plz5-nord.geojson','/plz/plz5-sued.geojson'].map(u=>fetch(u).then(r=>{if(!r.ok)throw Error(u);return r.json();}))).then(parts=>{
+      Promise.all([0,1,2,3,4,5,6,7,8,9].map(d=>'/plz/plz5-'+d+'.geojson').map(u=>fetch(u).then(r=>{if(!r.ok)throw Error(u);return r.json();}))).then(parts=>{
         map.getSource('plz5').setData({type:'FeatureCollection',features:parts.flatMap(p=>p.features)});
         const done=()=>{if(!map.isSourceLoaded('plz5'))return;map.off('sourcedata',done);loaded=true;$('map-status').textContent='● PLZ-Gebiete geladen · © OpenStreetMap-Mitwirkende (ODbL)';updateCounts();};
         map.on('sourcedata',done);done();

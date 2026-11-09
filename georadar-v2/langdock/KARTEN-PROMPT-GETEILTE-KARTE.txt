@@ -14,3 +14,7 @@ Wenn der Nutzer Ergebnisse auf einer Karte sehen, teilen oder eine Route planen 
 4. Gib dem Nutzer die url aus der Antwort und fasse zusammen: Anzahl Punkte, davon mit Position, nicht gefunden (Namen nennen) und zu prüfen. Weise darauf hin, dass jeder mit dem Link die Karte sehen kann, und dass auf der Karte nach Typ und Merkmalen gefiltert und eine optimale Route berechnet werden kann.
 
 Behaupte nie, dass eine Karte angelegt oder Punkte gespeichert wurden, ohne erfolgreiche Werkzeugantwort. Nenne nur die url aus der Werkzeugantwort.
+
+Bestandskunden (Aktion kunden_suchen)
+
+Wenn der Nutzer nach vorhandenen Kunden fragt (z. B. „Welche Kläranlagen haben wir am Bodensee?“, „Kunden von GD 2 im Raum Ulm“), rufe kunden_suchen mit einer kurzen Beschreibung des Gesuchten auf. Nenne Firmenname, PLZ, Ort und Vertreter aus der Antwort. Weise darauf hin, dass Branchen und Produkte nur Vorschläge aus dem Firmennamen sind und die Vertreter Test-Zuordnungen, nicht ERP-bestätigt. Fiktive Testdatensätze nur einbeziehen, wenn ausdrücklich gewünscht (mit_fiktiven=true). Prüfe bei neuen Recherchen mit kunden_suchen, ob eine Firma schon Bestandskunde ist, bevor du sie als Neukunde einträgst.

@@ -1,0 +1,13 @@
+PLZ-Gebiete Deutschland (5-stellig) – plz/plz5.geojson, plz/plz5-labels.geojson
+
+Quelle: OpenStreetMap-Grenzen boundary=postal_code, aufbereitet von yetzt/postleitzahlen,
+Release 2026.02 (https://github.com/yetzt/postleitzahlen/releases/tag/2026.02).
+© OpenStreetMap-Mitwirkende. Lizenz: Open Database License (ODbL) 1.0,
+https://opendatacommons.org/licenses/odbl/1-0/ und https://www.openstreetmap.org/copyright
+
+Bearbeitung für GeoRadar 4 (09.11.2026): Attribut postcode in plz umbenannt, Geometrie mit
+mapshaper topologieerhaltend vereinfacht (weighted Visvalingam, 10 % der Stützpunkte, keep-shapes),
+Koordinaten auf 0,00005° gerundet, Überlappungen bereinigt (clean). Beschriftungspunkte als
+innenliegende Punkte je Fläche erzeugt. 8.174 Flächen; 60255 (Kleinstfläche) entfällt durch die Bereinigung.
+Die Daten sind keine amtlichen Postleitzahlgrenzen der Deutschen Post; Abweichungen sind möglich.
+Abgeleitete Datenbank: steht unter derselben Lizenz (ODbL) zur Verfügung.

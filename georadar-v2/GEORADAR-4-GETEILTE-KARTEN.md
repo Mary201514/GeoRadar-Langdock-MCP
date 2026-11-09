@@ -16,7 +16,7 @@ Branch `georadar-4-plz-links-routing`, Basis `georadar-3-analysis-save-preview` 
 
 **Kartenseite `/k/<schlüssel>`** (wer den Link hat, sieht die Karte; der Schlüssel hat 144 Bit Zufall, ist nicht erratbar und nicht auflistbar; `noindex`, `no-referrer`):
 
-- **PLZ-Gebiete 5-stellig** dauerhaft hinterlegt (`dist/plz/plz5-nord.geojson` und `plz5-sued.geojson`, 8.174 Flächen, OSM/ODbL, Stand 02/2026). Grenzen ab Zoom 6, Nummern ab Zoom 9. Gebiete mit Punkten werden je nach Anzahl eingefärbt. Klick auf ein Gebiet zeigt die Anzahl und kann die Liste auf diese PLZ filtern. Die Ebene lässt sich unter „Ebenen“ abschalten und ist auch auf der normalen GeoRadar-Seite zuschaltbar.
+- **PLZ-Gebiete 5-stellig** dauerhaft hinterlegt (`dist/plz/plz5-0.geojson` bis `plz5-9.geojson`, 8.174 Flächen, OSM/ODbL, Stand 02/2026). Grenzen ab Zoom 6, Nummern ab Zoom 9. Gebiete mit Punkten werden je nach Anzahl eingefärbt. Klick auf ein Gebiet zeigt die Anzahl und kann die Liste auf diese PLZ filtern. Die Ebene lässt sich unter „Ebenen“ abschalten und ist auch auf der normalen GeoRadar-Seite zuschaltbar.
 - **Filter nach Typ & Merkmalen** entstehen automatisch aus den gelieferten Daten: Ankreuzlisten für Texte und ja/nein-Werte, von–bis für Zahlen. Sie wirken zusammen mit Status-, Such-, Länder- und Vertreterfiltern.
 - **Route planen:** Punkte im Popup mit „Zur Route“ auswählen oder „Gefilterte übernehmen“ (höchstens 48 Stopps). Start bei Mangold Friedrichshafen oder einem gewählten Punkt, Rundtour optional. „Optimale Route berechnen“ optimiert die Reihenfolge (OpenRouteService/VROOM) und zeichnet die Straßenroute mit Kilometern und Fahrzeit je Etappe. Ein Link öffnet die Route in Google Maps zur Navigation (bei mehr als 10 Stopps in Etappen).
 

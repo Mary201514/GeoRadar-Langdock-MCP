@@ -2,13 +2,23 @@
   'use strict';
   const statuses={existing:{label:'Bestandskunde',color:'#2387ec'},prospect:{label:'Potenzieller Neukunde',color:'#ffffff'},priority:{label:'Besonders interessant',color:'#e0444e'},unknown:{label:'Status ungeklärt',color:'#788592'}};
   const aliases={Bestandskunde:'existing',Bestandskunden:'existing',Neukunde:'prospect',Neukunden:'prospect','Potenzieller Neukunde':'prospect','Besonders interessant':'priority','Status ungeklärt':'unknown'};
-  const optional=['customerNumber','street','postalCode','postalPrefix','city','state','district','industry','product','potential','contact','notes','relationships','coordinateSource','personnelNumber','salesRep','reason','opportunity'];
+  const optional=['type','address','formattedAddress','geocodeNote','customerNumber','street','postalCode','postalPrefix','city','state','district','industry','product','potential','contact','notes','relationships','coordinateSource','personnelNumber','salesRep','reason','opportunity'];
   function webUrl(value){if(typeof value!=='string'||value.length>2000)throw Error('Quellen-/Website-URL muss Text mit höchstens 2.000 Zeichen sein.');let u;try{u=new URL(value);}catch{}if(!u||!['http:','https:'].includes(u.protocol)||u.username||u.password)throw Error('Nur http/https-URLs ohne eingebettete Zugangsdaten sind erlaubt.');return u.href;}
   function position(r){
     if(Number.isFinite(r.lon)&&Number.isFinite(r.lat))return {coordinates:[r.lon,r.lat],isPrefix:false};
     const prefix=r.postalPrefix||(/^\d{2}$/.test(r.postalCode||'')?r.postalCode:undefined);
     const ref=P?.countries?.[r.country==='Deutschland'||r.country==='DE'?'DE':'AT']?.[prefix];
     return ref?{coordinates:ref.coordinates.slice(),isPrefix:true,prefix}:null;
+  }
+  function attributes(value){
+    if(!value||typeof value!=='object'||Array.isArray(value))throw Error('attributes muss ein Objekt mit Merkmal: Wert sein.');
+    const keys=Object.keys(value);if(keys.length>30)throw Error('Höchstens 30 Zusatzmerkmale je Punkt.');
+    const out={};for(const key of keys){const k=key.trim();if(!k||k.length>60||/[\u0000-\u001f]/.test(k))throw Error('Merkmalname 1–60 Zeichen: '+key.slice(0,60));const v=value[key];if(v===null||v===undefined||v==='')continue;
+      if(typeof v==='string'){if(v.length>500)throw Error('Merkmal '+k+' ist zu lang (max. 500 Zeichen).');out[k]=v.trim();}
+      else if(typeof v==='number'){if(!Number.isFinite(v))throw Error('Merkmal '+k+' ist keine gültige Zahl.');out[k]=v;}
+      else if(typeof v==='boolean')out[k]=v;
+      else throw Error('Merkmal '+k+' muss Text, Zahl oder true/false sein.');}
+    return out;
   }
   function postalLabel(r){return r.postalPrefix&&(!r.postalCode||r.postalCode.length===2)?'PLZ-Präfix '+r.postalPrefix+'…':r.postalCode||'';}
   function validateTerritories(value){
@@ -35,6 +45,7 @@
         if(!Object.hasOwn(statuses,r.status))throw Error('Unbekannter Kundenstatus.');
         for(const field of optional){if(raw[field]===undefined||raw[field]===null)continue;if(typeof raw[field]!=='string'||raw[field].length>4000)throw Error(field+' muss Text mit höchstens 4.000 Zeichen sein.');r[field]=raw[field].trim();}
         if(raw.website!==undefined&&raw.website!=='')r.website=webUrl(raw.website);
+        if(raw.attributes!==undefined&&raw.attributes!==null)r.attributes=attributes(raw.attributes);
         for(const field of ['isFictional','needsReview'])if(raw[field]!==undefined){if(typeof raw[field]!=='boolean')throw Error(field+' muss true oder false sein.');r[field]=raw[field];}
         if(raw.sources!==undefined){if(!Array.isArray(raw.sources)||raw.sources.length>20)throw Error('sources muss eine Liste mit höchstens 20 Quellen sein.');r.sources=raw.sources.map(s=>{if(!s||typeof s!=='object'||Array.isArray(s))throw Error('Quelle benötigt url und optional title.');const source={url:webUrl(s.url)};if(s.title!==undefined){if(typeof s.title!=='string'||s.title.length>300)throw Error('Quellentitel ist zu lang.');source.title=s.title.trim();}return source;});}
         if(r.postalCode&&!((r.country==='Deutschland'?/^(?:\d{2}|\d{5})$/:/^(?:\d{2}|\d{4})$/).test(r.postalCode)))throw Error('PLZ muss vollständig oder als zweistelliges Präfix als Text übergeben werden.');

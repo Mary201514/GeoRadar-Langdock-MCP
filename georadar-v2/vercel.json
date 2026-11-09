@@ -7,7 +7,7 @@
   "functions": {
     "api/mcp.mjs": {
       "includeFiles": "{dist/**,mcp/**,backend/**}",
-      "maxDuration": 30
+      "maxDuration": 60
     },
     "api/research.mjs": {
       "includeFiles": "{dist/**,backend/**}",
@@ -20,6 +20,14 @@
     "api/views.mjs": {
       "includeFiles": "{dist/**,backend/**}",
       "maxDuration": 30
+    },
+    "api/karte.mjs": {
+      "includeFiles": "{dist/**,backend/**}",
+      "maxDuration": 30
+    },
+    "api/route.mjs": {
+      "includeFiles": "{dist/**,backend/**}",
+      "maxDuration": 60
     }
   },
   "rewrites": [
@@ -30,6 +38,10 @@
     {
       "source": "/mcp/",
       "destination": "/api/mcp"
+    },
+    {
+      "source": "/k/:key([A-Za-z0-9_-]{22,64})",
+      "destination": "/index.html"
     },
     {
       "source": "/:code([A-Za-z][A-Za-z0-9-]{2,31})",
@@ -51,6 +63,32 @@
         {
           "key": "Cache-Control",
           "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/k/:key*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/plz/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
         }
       ]
     }

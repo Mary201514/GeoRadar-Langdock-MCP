@@ -54,6 +54,6 @@ function createPrivateViews({fetchImpl=(...a)=>fetch(...a),getConfig=()=>({url:p
   }catch(e){return error(e);}
  }
  function error(e){return e instanceof WebError?json(e.status,{error:e.code,message:e.message}):json(500,{error:'WEB_INTERNAL_ERROR',message:'Die private Auswertung konnte nicht verarbeitet werden.'});}
- return {auth,views};
+ return {auth,views,user};
 }
 module.exports={createPrivateViews,WebError};

@@ -37,6 +37,16 @@ Die Routen-API nimmt nur IDs der gespeicherten Punkte an; Koordinaten kommen aus
 3. **Deployen.** Das Vercel-Projekt hat keine direkte Git-Verbindung, also nach dem Merge wie bisher deployen (`vercel --prod` im Repo-Stamm). Ohne `SERPAPI_KEY` bleiben Adressen offen; ohne `ORS_API_KEY` zeigt die Karte „Routing nicht eingerichtet“. Beides fällt sauber zurück, nichts bricht.
 4. **Langdock:** In der bestehenden MCP-Integration „Mangold GeoRadar – Supabase“ → *Server-Funktionen auflisten* → `karte_anlegen` und `punkte_hinzufuegen` aktivieren → speichern → im Agenten unter Aktionen zuweisen → Agent aktualisieren. Agentenanweisung: `langdock/KARTEN-PROMPT-GETEILTE-KARTE.txt`.
 
+## Bestandskundenliste (Startseite und semantische Suche)
+
+- **Tabelle `georadar_kunden`** (Migration `supabase/migrations/20261109_georadar_kunden.sql`): Kundenstamm 3.1, 1.040 Sätze (1.000 aus Vorlage, ungeprüft gegen ERP; 40 fiktive mit `ist_fiktiv = true`). Alle Originalspalten in `daten`, Kartenformat in `record`. Die Kundendaten liegen **nicht** im Repository; sie werden separat über den SQL Editor eingespielt.
+- **Positionen** ungefähr: Innenpunkt des 5-stelligen PLZ-Gebiets (1.004), PLZ-Ortspunkt GeoNames (16, u. a. Österreich), Ortsmitte über den Ortsnamen bei Postfach-/Großkunden-PLZ oder Tippfehlern (20, als „zu prüfen“ markiert).
+- **Startseite** (`/` ohne `?view=`): nach der Anmeldung (vorhandene Web-Anmeldung, Supabase-Konten) lädt `/api/kunden` alle Kunden als Punkte. Ohne Anmeldung bleibt die Karte leer mit Hinweis und Anmeldeknopf. Geteilte Links `/k/…`, `/AB382` und gespeicherte Ansichten laden die Liste nicht.
+- **Semantische Suche:** MCP-Werkzeug `kunden_suchen` (Embedding der Anfrage über die Langdock-API, EU, `text-embedding-ada-002`, 1536 Dimensionen; Kosinus-Ähnlichkeit per pgvector/HNSW) kombiniert mit deutscher Volltextsuche. Ohne Embeddings oder ohne Key: nur Volltext, mit Hinweis.
+- **Embeddings erzeugen:** MCP-Werkzeug `kunden_embeddings_aktualisieren` (ca. 40 s je Aufruf, Pakete à 96, wiederholen bis `offen = 0`). Ändert sich der Suchtext eines Kunden, wird nur dessen Embedding erneuert.
+- **Vercel-Variable:** `LANGDOCK_API_KEY` (Langdock → Einstellungen → API → Key mit Berechtigung „Embedding API“), optional `LANGDOCK_REGION` (Standard `eu`).
+- Tests: `node test/check-kunden.cjs` (9 Vertragstests), `node test/check-kunden-browser.cjs` (Startseite mit simulierter Anmeldung). Nur synthetische Testfirmen.
+
 ## Kosten und Grenzen
 
 - **SerpApi:** eine Suche pro neuer Adresse; wiederholte Adressen kommen aus dem Cache und kosten nichts. Für 1.000 neue Adressen also 1.000 Suchen.

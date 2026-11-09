@@ -28,6 +28,10 @@
     "api/route.mjs": {
       "includeFiles": "{dist/**,backend/**}",
       "maxDuration": 60
+    },
+    "api/kunden.mjs": {
+      "includeFiles": "{dist/**,backend/**}",
+      "maxDuration": 30
     }
   },
   "rewrites": [

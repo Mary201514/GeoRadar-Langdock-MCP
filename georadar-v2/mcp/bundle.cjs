@@ -11,7 +11,7 @@ function bundle(){
     scripts.push('<script>'+fs.readFileSync(source,'utf8').replace(/<\/script/gi,'<\\/script')+'</script>');
   }
   html=html.replace('<base href="/">','');
-  for(const name of ['shared-map.js','plz-layer.js','route-planner.js'])html=html.replace('<script defer src="'+name+'"></script>','');
+  for(const name of ['shared-map.js','plz-layer.js','route-planner.js','default-customers.js'])html=html.replace('<script defer src="'+name+'"></script>','');
   html=html.replace('src="mangold.svg"','src="data:image/svg+xml;base64,'+fs.readFileSync(path.join(dist,'mangold.svg')).toString('base64')+'"');
   const style='<script>window.GEORADAR_STYLE='+JSON.stringify(JSON.parse(fs.readFileSync(path.join(dist,'base-style.json'),'utf8'))).replace(/</g,'\\u003c')+';</script>';
   return html.replace('</body>',()=>style+scripts.join('\n')+'</body>');

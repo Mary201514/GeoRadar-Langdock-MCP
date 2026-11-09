@@ -28,6 +28,10 @@
     "api/route.mjs": {
       "includeFiles": "georadar-v2/{dist/**,backend/**}",
       "maxDuration": 60
+    },
+    "api/kunden.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,backend/**}",
+      "maxDuration": 30
     }
   },
   "rewrites": [

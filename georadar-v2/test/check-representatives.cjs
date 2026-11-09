@@ -18,5 +18,5 @@ for(const product of ['Pumpen','Rührwerke','Kläranlagen','Kommunen','Bäderbet
 assert.equal(R.suggest({status:'prospect',product:'Pumpen',country:'Deutschland',postalCode:'88046'},territories),null);
 assert.equal(R.suggest({status:'prospect',product:'Elektromotoren'}),null);assert.equal(R.suggest({status:'unknown',product:'Pumpen'}),null);
 assert.throws(()=>I.fromRows([['Firma','Land','Vertreter','salesRep'],['Fiktiv','DE','GK','CO']]));assert.throws(()=>I.csv('Firma;Land\n"offen;DE'));
-const schema=handle({jsonrpc:'2.0',id:1,method:'tools/list'}).result.tools;assert.equal(schema.length,5);assert.equal(schema[0].inputSchema.properties.territories.maxItems,5);assert(schema[0].inputSchema.properties.territories.items.properties.code.enum.includes('GK'));
+const schema=handle({jsonrpc:'2.0',id:1,method:'tools/list'}).result.tools;assert.equal(schema.length,7);assert.equal(schema[0].inputSchema.properties.territories.maxItems,5);assert(schema[0].inputSchema.properties.territories.items.properties.code.enum.includes('GK'));
 console.log('PASS: five representatives, all colors and aliases, CSV/PLZ strings, assignment precedence/no redistribution, all GK specialties, suggestions without mutation, legacy territories and additive MCP schema.');

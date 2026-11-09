@@ -33,3 +33,5 @@
 .attribute-table th{text-align:left;font-weight:600;padding:2px 8px 2px 0;vertical-align:top;white-space:nowrap}
 .attribute-table td{padding:2px 0;overflow-wrap:anywhere}
 .maplibregl-popup-content .outline{margin-top:8px}
+.customer-notice{display:grid;gap:6px;margin-top:6px}
+.customer-notice button{justify-self:start}

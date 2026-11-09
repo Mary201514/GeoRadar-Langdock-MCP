@@ -1,0 +1,14 @@
+GeoNames Postal Code datasets (DE.zip and AT.zip), retrieved 2026-11-02.
+https://download.geonames.org/export/zip/
+https://download.geonames.org/export/zip/readme.txt
+Attribution: GeoNames, https://www.geonames.org/
+License: Creative Commons Attribution 4.0, https://creativecommons.org/licenses/by/4.0/
+
+Derived reference points only, not postal boundaries or company locations.
+For each full postcode, average all listed place coordinates; for each two-digit
+prefix, average these postcode reference points with equal weight. Coordinates
+are rounded to five decimals. Dataset entries outside the DE/AT application
+extent (lon 5-18, lat 46-56) are excluded. Missing prefixes are not invented.
+These points are schematic orientation aids. GeoNames supplies data without
+warranty of accuracy, completeness or currency. Regenerate using
+scripts/build-postal-prefixes.py. Original customer data is never submitted.

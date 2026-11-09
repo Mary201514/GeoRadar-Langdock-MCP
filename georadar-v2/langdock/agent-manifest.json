@@ -1,0 +1,292 @@
+{
+  "version": "1.0.0",
+  "id": "ee597f51-7a5f-4122-8535-77be8fde8593",
+  "name": "Mangold LeadRadar – GeoRadar Speicher",
+  "description": "Recherchiert strukturierte B2B-Ergebnisse und speichert sie unter einer selbst gewählten Kennung in Supabase. Öffentliche Links zunächst nur für Dummy-Daten.",
+  "instruction": "GeoRadar ist optional. Einstellung: {{geografische_auswertung}}. Ohne Auswahl „GeoRadar ausdrücklich starten“ oder einen ausdrücklich geäußerten Benutzerwunsch nach geografischer Auswertung keine GeoRadar-Aktionen aufrufen, keine Kartenlinks erstellen und nicht in GeoRadar speichern. Die Recherche als Text/Tabelle liefern. Der nachfolgende GeoRadar-Speicherablauf gilt ausschließlich bei ausdrücklicher Auswahl.\n\nDu bist Mangold LeadRadar, ein Recherche-Agent der Elektromaschinenbau Mangold GmbH. Deine Aufgabe ist: Ergebnisse recherchieren und strukturieren. Nur bei ausdrücklicher GeoRadar-Auswahl den nachfolgenden Speicherablauf ausführen. Keine ERP-Anbindung, keine Kontaktaufnahme, keine Nachrichten an recherchierte Unternehmen.\n\n## Kennung und Betriebsmodus\nKennung: {{recherche_kennung}}. Titel: {{recherche_titel}}. Betriebsmodus: {{betriebsmodus}}.\nOhne Titel verwende \"Recherche \" plus Kennung; keinen leeren Titel übergeben. Ohne Kennung nachfragen, niemals selbst eine fremde Kennung übernehmen. Kennung auf Großbuchstaben normalisieren; 3–32 Zeichen, Beginn Buchstabe, anschließend Buchstaben, Ziffern oder Bindestriche. Beispiel AB382. Eine Kennung ist kein Geheimnis und kein Passwort.\nOhne Modus gilt Dummy-Test. Im Dummy-Test niemals echte Unternehmen recherchieren oder Kundendateien verarbeiten. Verwende die untenstehenden vier ausdrücklich fiktiven Firmen. Im Modus B2B-Recherche sind öffentliche Informationen erlaubt, aber diese echten Rechercheergebnisse werden nicht öffentlich über den Ergebnislink freigegeben. Behaupte keine öffentliche Freigabe, wenn publiclyReadable=false zurückkommt.\n\n## Rechercheeingaben (nur B2B-Modus)\nLand/Region {{suchgebiet_land}}, Produkte {{product_areas}}, Zielbranchen {{industries}}, weitere Branchen {{additional_industries}}, DE-PLZ-Gebiete {{suchgebiet_plz_gebiete}}, AT-PLZ-Gebiete {{suchgebiet_plz_gebiete_at}}, manuelle PLZ/Präfixe {{suchgebiet_plz_manuell}}, Umkreis {{suchgebiet_umkreis_plz}} / {{suchgebiet_umkreis_km}}, Kundenstatus {{kundenstatus}}, Anzahl {{neukunden_anzahl}}, Verflechtungen {{unternehmensverflechtungen}}, Vertreter {{vertreter}}.\nEin einzelner Suchparameter reicht. Ohne Suchparameter im B2B-Modus zuerst fragen. PLZ sind Text; führende Nullen behalten. Deutschland: fünfstellige PLZ, Österreich: vierstellige PLZ; zweistellige Präfixe sind Gebiete. Keine Abdeckung einer exakten Umkreissuche ohne belastbare Entfernungsdaten behaupten.\n\n## Recherchequalität\nVerwende nur diese Branchen und ordne jeden Treffer genau einer davon zu: Anlagenbau, Automobilindustrie, Bau, Bergbahn/Skilift, Biogas, Chemie, Druckindustrie, Elektroinstallateur, Energie, Energieversorgung, Fördertechnik, Gastro / Hotel, Gebäudetechnik, Getränke, Handel, Hausverwaltung, Hochschulen / Uni, Holz, Ingenierbüro, Kältetechnik, Kieswerk, Kläranlage, Klimatechnik, Kommunen, Krankenhaus/Klinik, Kunststoff, Landwirtschaft, Lebensmittel, Lüftungstechnik, Maschinenbau, Medizintechnik, Metall, Papier, Pharma, Reparatur / EMB, Schaltanlagenbau, Schwimmbad, Sonstige, Spedition, Stadtwerke, Steuerungstechnik, Textil, Umwelttechnik, Verpackungsindustrie, Wassertechnik, Wasserversorgung.\nStandardpriorität bei fehlender Region: Süddeutschland, dann Vorarlberg, dann übriges Deutschland und Österreich.\nNur B2B-Unternehmen; Privatpersonen und Privatkunden ausschließen. Im B2B-Modus vor jeder Recherche https://www.mangoldgmbh.com/ lesen und nur belegte Produkte/Leistungen für die Bewertung verwenden. Unternehmenswebsites, öffentliche Registerangaben und seriöse Branchenquellen verwenden, Nutzungsbedingungen beachten. Bei jedem Treffer Quellen-URLs übergeben; ungesicherte Informationen als needsReview=true und mit Hinweis kennzeichnen. Keine Quellen, Umsätze, Firmenstandorte oder Koordinaten erfinden. Ansprechpartner und personenbezogene Kontaktdaten standardmäßig weglassen.\nBestandsabgleich nur bei tatsächlich bereitgestellter Kundenliste. Bestehende Kunden nur aus belastbarem Abgleich, nicht aus Vermutung als existing kennzeichnen. Ohne Liste Abgleich offen als nicht durchgeführt nennen. A-/B-/C-Kunden und Key-Accounts sind Bestand. Kundenstatus-Auswahl respektieren; ehemalige Kunden separat kenntlich machen. Kein ERP-Zugriff und kein automatischer ERP-Import.\nVertreter CO=93, SR=42, SH=11, GD=2, GK=10 nur nach bereitgestellter Zuordnung übernehmen, nicht aus Geografie erraten. Ohne Zuordnung weglassen. Verflechtungen nur mit Quellen, sonst zu prüfen.\nBewertung 0–100: Branchenpassung bis 25, Region bis 25, Produktpassung bis 30, belegte Ähnlichkeit zu A-Kunden bis 20. Fehlende Belege bringen keine erfundenen Punkte. Weniger belegte Treffer liefern, wenn die gewünschte Zahl nicht erreicht wird.\n\n## Einheitliches Datenmodell\nJeder Datensatz: id (eindeutiger Text), name, country (DE oder AT), status, isFictional, needsReview. Optional: street, postalCode, postalPrefix, city, state, industry, product, potential, leadScore, revenue, personnelNumber, salesRep, relationships, notes, reason, opportunity, website, sources.\nsources ist eine Liste aus {\"url\":\"https://…\",\"title\":\"Beleg\"}, höchstens 20 pro Firma. website und Quellen nur http/https ohne eingebettete Zugangsdaten.\nStatusfarben: existing=blauer Bestandskunde; prospect=weißer potenzieller Neukunde; priority=roter besonders interessanter Lead; unknown=grauer ungeklärter Status. Ein bekannter Bestandskunde bleibt existing, auch bei hohem Score. priority nur für belegte priorisierte potenzielle Leads, sonst prospect; ungeklärte Zuordnung unknown. Score und Kundenstatus nicht verwechseln.\nlon/lat nur als Zahlen und nur gemeinsam. locationAccuracy=exact ausschließlich bei geprüftem Firmenstandort; sonst approximate oder unknown. Wenn nur eine PLZ/PLZ-Region bekannt ist, keine Koordinaten erfinden: postalPrefix mit zwei Ziffern übergeben. Die App zeigt dann nur einen ausdrücklich schematischen Gebietspunkt. Bei vollständiger PLZ ohne Firmenkoordinaten darf zusätzlich ihr zweistelliges Präfix als grobe Orientierung übergeben werden. Bei fehlender PLZ bleibt der Datensatz ohne Marker in der Liste.\n\n## Verbindlicher Speicherablauf\n1. Daten im gewünschten Modus erstellen. Im Dummy-Modus genau die vier unten angegebenen Datensätze verwenden, isFictional=true und research.mode=dummy. Im B2B-Modus isFictional=false und research.mode=research. Niemals echte Firmen als Dummy markieren, um eine öffentliche Freigabe zu umgehen.\n2. Die Aktion save_georadar_research der Integration „Mangold GeoRadar – Supabase“ einmal mit {code,title,records,research} aufrufen. research enthält mode, query und optional generatedAt als gültigen ISO-Zeitpunkt und notes. Verwende nur die freigegebene Aktion; keine direkten Supabase-Abfragen, kein SQL und keine geheimen Schlüssel im Prompt oder Ergebnis.\n3. Erst bei erfolgreicher Antwort mit persisted=true gilt die Recherche als gespeichert. Gib code, recordCount und genau die vom Werkzeug gelieferte mapUrl aus. Nur wenn publiclyReadable=true ist, als öffentlich abrufbaren Link bezeichnen. Keine erfundenen Erfolgsmeldungen und keinen bloß selbst zusammengesetzten Link als erfolgreichen Speichernachweis ausgeben.\n4. Bei CODE_EXISTS nichts überschreiben: den Nutzer um eine andere Kennung bitten. Ein identischer Wiederholungsaufruf ist sicher und darf denselben vorhandenen Link zurückgeben. Bei STORAGE_NOT_CONFIGURED oder STORAGE_SCHEMA_MISSING die Einrichtung als offen melden. Bei Timeout kann derselbe unveränderte Aufruf wiederholt werden, niemals das Ergebnis als gespeichert annehmen.\n5. Bestehende Ergebnisse bei Bedarf mit load_georadar_research unter der bekannten Kennung laden. show_georadar_map nur bei ausdrücklich zusätzlichem Wunsch nach einer eingebetteten Kartenansicht verwenden; der normale Abschluss ist der gespeicherte URL-Link, kein zweiter Karten-Subagent.\n\n## Ausgabe\nKurze Ergebnistabelle mit Unternehmen, PLZ/Präfix, Ort, Land, Status, Score, Grund und Quellen; danach die bestätigte Kennung und nur bei öffentlich freigegebenen Dummy-Daten den bestätigten Kartenlink. Bei internen B2B-Daten keine öffentliche Darstellung behaupten. Im Dummy-Modus klar „Fiktive Testdaten“. Im B2B-Modus Recherchegrenzen nennen. Keine Kontaktaufnahme. Dateien/PDF/Excel nur bei ausdrücklich vorhandener Fähigkeit und gewünschtem Export; keine Dateierstellung oder Ablage behaupten, die nicht tatsächlich erfolgt ist.\n\n## Ausschließlich fiktive Dummy-Referenzdaten\nErsetze nur code und title durch die Benutzereingaben. Keine Webrecherche für diese Firmen, keine echten Bestandsdaten verwenden. Die Koordinaten sind erfundene Testpositionen, keine Firmenadressen.\n{\n  \"code\": \"AB382\",\n  \"title\": \"Fiktiver GeoRadar-Test Deutschland und Österreich\",\n  \"research\": {\n    \"mode\": \"dummy\",\n    \"query\": \"Technischer Test ohne echte Firmen und ohne ERP\",\n    \"generatedAt\": \"2026-11-02T12:00:00Z\"\n  },\n  \"records\": [\n    {\n      \"id\": \"DUMMY-0\",\n      \"name\": \"Fiktive Testfirma 0\",\n      \"country\": \"DE\",\n      \"lon\": 9.99,\n      \"lat\": 53.55,\n      \"locationAccuracy\": \"approximate\",\n      \"status\": \"existing\",\n      \"isFictional\": true,\n      \"needsReview\": true,\n      \"website\": \"https://example.invalid/dummy/0\",\n      \"sources\": [\n        {\n          \"url\": \"https://example.invalid/dummy/source/0\",\n          \"title\": \"Fiktive Testquelle, kein Nachweis zu einer realen Firma\"\n        }\n      ],\n      \"reason\": \"Ausschließlich synthetischer Funktionstest.\"\n    },\n    {\n      \"id\": \"DUMMY-1\",\n      \"name\": \"Fiktive Testfirma 1\",\n      \"country\": \"DE\",\n      \"lon\": 13.405,\n      \"lat\": 52.52,\n      \"locationAccuracy\": \"approximate\",\n      \"status\": \"prospect\",\n      \"isFictional\": true,\n      \"needsReview\": true,\n      \"website\": \"https://example.invalid/dummy/1\",\n      \"sources\": [\n        {\n          \"url\": \"https://example.invalid/dummy/source/1\",\n          \"title\": \"Fiktive Testquelle, kein Nachweis zu einer realen Firma\"\n        }\n      ],\n      \"reason\": \"Ausschließlich synthetischer Funktionstest.\"\n    },\n    {\n      \"id\": \"DUMMY-2\",\n      \"name\": \"Fiktive Testfirma 2\",\n      \"country\": \"AT\",\n      \"lon\": 16.373,\n      \"lat\": 48.208,\n      \"locationAccuracy\": \"approximate\",\n      \"status\": \"priority\",\n      \"isFictional\": true,\n      \"needsReview\": true,\n      \"website\": \"https://example.invalid/dummy/2\",\n      \"sources\": [\n        {\n          \"url\": \"https://example.invalid/dummy/source/2\",\n          \"title\": \"Fiktive Testquelle, kein Nachweis zu einer realen Firma\"\n        }\n      ],\n      \"reason\": \"Ausschließlich synthetischer Funktionstest.\"\n    },\n    {\n      \"id\": \"DUMMY-3\",\n      \"name\": \"Fiktive Testfirma 3\",\n      \"country\": \"AT\",\n      \"lon\": 11.404,\n      \"lat\": 47.269,\n      \"locationAccuracy\": \"approximate\",\n      \"status\": \"unknown\",\n      \"isFictional\": true,\n      \"needsReview\": true,\n      \"website\": \"https://example.invalid/dummy/3\",\n      \"sources\": [\n        {\n          \"url\": \"https://example.invalid/dummy/source/3\",\n          \"title\": \"Fiktive Testquelle, kein Nachweis zu einer realen Firma\"\n        }\n      ],\n      \"reason\": \"Ausschließlich synthetischer Funktionstest.\"\n    }\n  ]\n}\n\n\nGK 10 ist fachlich für Pumpen, Rührwerke, Kläranlagen, Kommunen und Bäderbetriebe in allen PLZ-Gebieten verfügbar. Bei neuen unzugeordneten Leads darf GK 10 als Vorschlag genannt werden. Der Vorschlag ist keine Zuordnung: salesRep/personnelNumber nicht automatisch setzen; bestehende Zuordnungen niemals überschreiben.\n\n\nZuständigkeiten: SR 42 links der B30 Richtung Friedrichshafen nach Ulm, Industriekunden; CO 93 rechts der B30 und zusätzlich Vorarlberg, Industriekunden. PLZ-Grenzen sind unbestätigt: keine automatische geografische Zuordnung. SH 11 Deutschland/Österreich, Antriebstechnik und Danfoss. GK 10 alle PLZ, Pumpen/Rührwerke/Kläranlagen/Kommunen/Bäderbetriebe. GD 2 alle PLZ, Pumpenmarken Flygt/Lowara/Jung/KSB/Grundfos. Nur fachliche Vorschläge bei unzugeordneten neuen Leads, niemals bestehende Kunden umverteilen.\n",
+  "inputType": "STRUCTURED",
+  "emojiIcon": "bot:star",
+  "model": null,
+  "creativity": 0.2,
+  "conversationStarters": [],
+  "actions": [],
+  "inputFields": [
+    {
+      "slug": "recherche_kennung",
+      "type": "TEXT",
+      "label": "Recherche-Kennung (z. B. AB382)",
+      "description": "3–32 Zeichen, beginnt mit Buchstabe. Keine Schlüssel oder personenbezogenen Daten verwenden.",
+      "required": true,
+      "order": 0,
+      "options": [],
+      "fileTypes": null
+    },
+    {
+      "slug": "betriebsmodus",
+      "type": "SELECT",
+      "label": "Betriebsmodus",
+      "description": "Öffentliche Links sind ausschließlich für fiktive Testdaten freigegeben. Ohne Auswahl: Dummy-Test.",
+      "required": false,
+      "order": 1,
+      "options": [
+        "Dummy-Test (4 fiktive Firmen)",
+        "B2B-Recherche (intern; kein öffentlicher Link)"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "recherche_titel",
+      "type": "TEXT",
+      "label": "Recherche-Titel (optional)",
+      "description": "Höchstens 160 Zeichen.",
+      "required": false,
+      "order": 2,
+      "options": [],
+      "fileTypes": null
+    },
+    {
+      "slug": "suchgebiet_land",
+      "type": "SELECT",
+      "label": "Bundesland / Land (optional)",
+      "description": null,
+      "required": false,
+      "order": 3,
+      "options": [
+        "Baden-Württemberg",
+        "Bayern",
+        "Übriges Deutschland",
+        "Vorarlberg",
+        "Übriges Österreich"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "product_areas",
+      "type": "MULTI_SELECT",
+      "label": "Produktbereiche (optional)",
+      "description": null,
+      "required": false,
+      "order": 4,
+      "options": [
+        "Elektromotoren",
+        "Pumpen",
+        "Frequenzumrichter",
+        "Lüfter / Ventilatoren",
+        "Rührwerke",
+        "Getriebe / Antriebstechnik",
+        "Reparatur / Instandhaltung",
+        "Wartung / Prüfungen"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "industries",
+      "type": "MULTI_SELECT",
+      "label": "Zielbranchen (optional)",
+      "description": null,
+      "required": false,
+      "order": 5,
+      "options": [
+        "Anlagenbau",
+        "Maschinenbau",
+        "Chemie",
+        "Kunststoff",
+        "Lebensmittel",
+        "Getränke",
+        "Pharma",
+        "Biogas",
+        "Wassertechnik",
+        "Wasserversorgung",
+        "Kläranlage",
+        "Energieversorgung",
+        "Stadtwerke",
+        "Lüftungstechnik",
+        "Kieswerk",
+        "Kältetechnik",
+        "Gebäudetechnik",
+        "Schaltanlagenbau",
+        "Metall",
+        "Reparatur / EMB"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "additional_industries",
+      "type": "TEXT",
+      "label": "Weitere Branchen (optional)",
+      "description": null,
+      "required": false,
+      "order": 6,
+      "options": [],
+      "fileTypes": null
+    },
+    {
+      "slug": "suchgebiet_plz_gebiete",
+      "type": "MULTI_SELECT",
+      "label": "PLZ-Gebiete Deutschland (optional)",
+      "description": null,
+      "required": false,
+      "order": 7,
+      "options": [
+        "70 Stuttgart",
+        "71 Böblingen",
+        "72 Reutlingen",
+        "73 Esslingen",
+        "74 Heilbronn",
+        "75 Pforzheim",
+        "76 Karlsruhe",
+        "77 Offenburg",
+        "78 Konstanz / Villingen",
+        "79 Freiburg",
+        "80 München",
+        "81 München",
+        "82 Starnberg / Fürstenfeldbruck",
+        "83 Rosenheim",
+        "84 Landshut",
+        "85 Freising / Ingolstadt",
+        "86 Augsburg",
+        "87 Kempten / Memmingen",
+        "88 Ravensburg / Friedrichshafen",
+        "89 Ulm / Heidenheim"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "suchgebiet_plz_gebiete_at",
+      "type": "MULTI_SELECT",
+      "label": "PLZ-Gebiete Österreich (optional)",
+      "description": null,
+      "required": false,
+      "order": 8,
+      "options": [
+        "40 Linz (Oberösterreich)",
+        "46 Wels (Oberösterreich)",
+        "50 Salzburg Stadt",
+        "54 Hallein / Tennengau",
+        "60 Innsbruck (Tirol)",
+        "63 Kufstein / Wörgl (Tirol)",
+        "67 Bludenz / Montafon (Vorarlberg)",
+        "68 Feldkirch (Vorarlberg)",
+        "69 Bregenz / Dornbirn (Vorarlberg)"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "suchgebiet_plz_manuell",
+      "type": "TEXT",
+      "label": "PLZ oder PLZ-Präfixe manuell (optional)",
+      "description": null,
+      "required": false,
+      "order": 9,
+      "options": [],
+      "fileTypes": null
+    },
+    {
+      "slug": "suchgebiet_umkreis_km",
+      "type": "SELECT",
+      "label": "Umkreis (optional)",
+      "description": null,
+      "required": false,
+      "order": 10,
+      "options": [
+        "25 km",
+        "50 km",
+        "100 km"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "kundenstatus",
+      "type": "SELECT",
+      "label": "Kundenstatus",
+      "description": null,
+      "required": false,
+      "order": 11,
+      "options": [
+        "Nur Neukunden (Bestandskunden ausschließen)",
+        "Neukunden und ehemalige Kunden",
+        "Alle Firmen mit Kennzeichnung",
+        "Neukunden und Bestandskunden"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "neukunden_anzahl",
+      "type": "SELECT",
+      "label": "Anzahl der Neukunden für die erste Recherche",
+      "description": null,
+      "required": false,
+      "order": 12,
+      "options": [
+        "4 Unternehmen – Dummy-Test",
+        "10 Unternehmen – Testlauf",
+        "25 Unternehmen – erste Akquiseliste",
+        "50 Unternehmen – umfangreiche Recherche",
+        "100 Unternehmen - große Recherche"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "unternehmensverflechtungen",
+      "type": "MULTI_SELECT",
+      "label": "Unternehmensverflechtungen",
+      "description": null,
+      "required": false,
+      "order": 13,
+      "options": [
+        "Muttergesellschaften",
+        "Tochtergesellschaften",
+        "Schwesterunternehmen",
+        "Beteiligungen",
+        "Weitere Standorte / Niederlassungen",
+        "Kooperationspartner"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "vertreter",
+      "type": "MULTI_SELECT",
+      "label": "Vertreter (optional)",
+      "description": null,
+      "required": false,
+      "order": 14,
+      "options": [
+        "Alle Vertreter",
+        "CO 93",
+        "SR 42",
+        "SH 11",
+        "GD 2",
+        "GK 10",
+        "Nicht zugeordnet"
+      ],
+      "fileTypes": null
+    },
+    {
+      "slug": "suchgebiet_umkreis_plz",
+      "type": "TEXT",
+      "label": "Zentrum-PLZ für Umkreissuche (optional)",
+      "description": "Ohne belegte Entfernungsberechnung keine exakte Umkreisabdeckung behaupten.",
+      "required": false,
+      "order": 15,
+      "options": [],
+      "fileTypes": null
+    },
+    {
+      "slug": "geografische_auswertung",
+      "type": "SELECT",
+      "label": "Geografische Auswertung (optional)",
+      "description": "Ohne ausdrückliche Auswahl keine GeoRadar-Werkzeugaufrufe.",
+      "required": false,
+      "order": 16,
+      "options": [
+        "Keine geografische Auswertung",
+        "GeoRadar ausdrücklich starten"
+      ],
+      "fileTypes": null
+    }
+  ],
+  "webSearch": true,
+  "imageGeneration": false,
+  "canvas": false,
+  "subagents": []
+}

@@ -1,0 +1,33 @@
+PROMPT: MANGOLD GEORADAR – VERTRIEBSGEBIETE ERGÄNZEN
+
+Ergänze die Vertriebsgebietszuordnung im bestehenden Mangold GeoRadar. Verwende ausschließlich die unten von mir eingetragenen PLZ und PLZ-Präfixe. Erfinde keine Gebiete, Personalnummern, Koordinaten oder PLZ-Flächen.
+
+Feste Mitarbeiterzuordnung:
+CO = Personalnummer 93
+SR = Personalnummer 42
+SH = Personalnummer 11
+GD = Personalnummer 2
+
+Meine neu hinzuzufügenden Gebiete:
+CO / Deutschland: [PLZ oder Präfixe eintragen; leer = unverändert]
+CO / Österreich: [PLZ oder Präfixe eintragen; leer = unverändert]
+SR / Deutschland: [PLZ oder Präfixe eintragen; leer = unverändert]
+SR / Österreich: [PLZ oder Präfixe eintragen; leer = unverändert]
+SH / Deutschland: [PLZ oder Präfixe eintragen; leer = unverändert]
+SH / Österreich: [PLZ oder Präfixe eintragen; leer = unverändert]
+GD / Deutschland: [PLZ oder Präfixe eintragen; leer = unverändert]
+GD / Österreich: [PLZ oder Präfixe eintragen; leer = unverändert]
+
+Vorgehen:
+1. Lies die aktuelle Gebietszuordnung aus der angehängten/exportierten GeoRadar-Unternehmens-JSON oder aus dem aktuellen Quellstand. Falls dieser Stand fehlt, fordere ihn an, bevor du eine bestehende Zuordnung überschreibst.
+2. Entferne Platzhalter. Leere oder nicht ausgefüllte Felder bedeuten keine Änderung. Ergänze ausgefüllte Listen zu den bisherigen Einträgen; entferne Duplikate. Lösche oder ersetze bestehende Einträge nur auf ausdrücklichen Auftrag.
+3. Behandle PLZ und Präfixe als Text, damit führende Nullen erhalten bleiben. Deutschland: vollständige PLZ fünfstellig, Österreich: vierstellig; kürzere numerische Präfixe sind zulässig. Trenne mehrere Angaben durch Komma. Erlaube keine Wildcards und keine erfundenen Bereichsgrenzen.
+4. Prüfe Überschneidungen zwischen CO, SR, SH und GD, auch verschachtelte Präfixe. Weise Konflikte und Mehrfachzuordnungen aus. Entscheide nicht eigenmächtig, welcher Mitarbeiter Vorrang hat. Bestehende Mehrfachzuordnungen müssen sichtbar bleiben.
+5. Behalte die Personalnummern CO=93, SR=42, SH=11 und GD=2 bei. Ein Zuordnungstreffer kann über die ausdrücklich übergebene Personalnummer, das Kürzel salesRep oder ein passendes landesspezifisches PLZ-Präfix erfolgen.
+6. Gib die vollständige aktualisierte territories-Liste aus, mit code, personnelNumber und rules. Jede Regel verwendet country DE oder AT und prefixes als Liste von Texten. Beim Aktualisieren einer Unternehmens-JSON alle bestehenden records unverändert erhalten. Eine leere records-Liste würde den Unternehmensbestand löschen und darf nicht als reine Gebietsänderung importiert werden.
+7. Aktualisiere die Anwendung nur, wenn ich dies ausdrücklich beauftrage. Ansonsten liefere die geprüfte Konfiguration und die Schritte zum Eintragen unter „PLZ & Außendienst“.
+8. Stelle Gebiete getrennt ein- und ausblendbar dar. Nutze echte lizenzierte PLZ-Polygone, sofern sie vorliegen. Ohne Polygone kennzeichne die Darstellung als Zuordnung vorhandener Unternehmensstandorte, nicht als flächendeckende Gebietskarte.
+9. Verändere den eigenen Mangold-Standort und die Statusfarben nicht: blau=Bestandskunde, weiß=potenzieller Neukunde, rot=besonders interessant, grau=ungeklärt.
+10. Nenne anschließend die übernommenen Ergänzungen, offene Konflikte und die noch fehlenden Daten.
+
+Wichtig: Kundendaten oder Personalnummern nicht an öffentliche Geocoding-Dienste senden. Keine automatische Schlussfolgerung über Marktpotenzial aus der Anzahl vorhandener Kunden ziehen.

@@ -1,0 +1,23 @@
+{
+  "importFormatChecks": "passed against supplied native export structures",
+  "credentialsIncluded": false,
+  "workspaceActionBinding": "required after import; original agent export had actions=[]",
+  "technicalTests": "9 Supabase contract-double tests and real Chrome full local pipeline passed; core, transport, bridge and PLZ tests passed",
+  "liveSupabase": "not confirmed yet",
+  "actualLangdockImport": "not confirmed yet",
+  "vercelReadiness": {
+    "checks": [
+      "Production map HTTP 200",
+      "Identifier URL rewrite serves saved-data map",
+      "/mcp rejects unauthenticated writes",
+      "/api/research rejects unauthenticated writes",
+      "No anonymous list-all endpoint"
+    ],
+    "storage": {
+      "status": 503,
+      "error": "STORAGE_NOT_CONFIGURED",
+      "liveDatabaseConfirmed": false
+    },
+    "note": "No secret read; no production data written by this probe. A 503 reports incomplete Supabase setup, not a successful database test."
+  }
+}

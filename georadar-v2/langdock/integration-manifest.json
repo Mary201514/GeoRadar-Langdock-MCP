@@ -1,0 +1,16 @@
+{
+  "id": "56ae47e2-4c8e-4caa-946d-d596325d1426",
+  "name": "Mangold GeoRadar – Supabase",
+  "color": null,
+  "description": "Speichert Recherchen unter Kennung und lädt gespeicherte Ergebnisse. Native MCP-Verbindung; Zugangsdaten erst beim Verbinden in Langdock eintragen.",
+  "authType": "API_KEY",
+  "integrationType": "MCP",
+  "suite": null,
+  "authFields": [],
+  "mcpClient": {
+    "url": "https://mangold-georadar.vercel.app/mcp",
+    "protocolVersion": "2025-11-25",
+    "clientVersion": "1.1.0",
+    "transportType": "STREAMABLE_HTTP"
+  }
+}

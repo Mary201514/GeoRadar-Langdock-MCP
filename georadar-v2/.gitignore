@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+.vercel/
+node_modules/
+verification/
+deliverables/
+mcp/map.html
+*.log

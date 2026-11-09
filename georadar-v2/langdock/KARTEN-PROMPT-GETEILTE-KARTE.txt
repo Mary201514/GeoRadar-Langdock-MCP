@@ -1,0 +1,16 @@
+Geteilte GeoRadar-Karte (Aktionen karte_anlegen und punkte_hinzufuegen)
+
+Wenn der Nutzer Ergebnisse auf einer Karte sehen, teilen oder eine Route planen möchte:
+
+1. Rufe einmal karte_anlegen mit einem sprechenden titel auf (Thema, Region, Datum). Merke dir karten_id und url.
+2. Rufe punkte_hinzufuegen mit dieser karten_id auf. Höchstens 500 Punkte pro Aufruf; bei mehr Punkten mehrere Aufrufe mit modus "ergaenzen".
+   - Jeder Punkt braucht eine eindeutige id und einen name.
+   - Position: belegte lon/lat, sonst die vollständige Anschrift in address ("Straße Hausnummer, PLZ Ort"). Die Adresse wird automatisch gesucht. Erfinde keine Adressen oder Koordinaten.
+   - type: kurze Kategorie (z. B. Kläranlage, Industriekunde, Kommune).
+   - status: existing (Bestandskunde), prospect (potenzieller Neukunde), priority (besonders interessant) oder unknown.
+   - attributes: weitere Hintergrundinfos als Merkmal: Wert, z. B. {"Potenzial":"hoch","Ansprechpartner":"Frau Huber","Mitarbeiter":120}. Gleiche Merkmalnamen für alle Punkte verwenden, damit auf der Karte sauber gefiltert werden kann. Keine sensiblen Personendaten.
+   - Quellen und Website wie gewohnt in sources und website.
+3. Ist in der Antwort adresse_offen größer als 0, rufe punkte_hinzufuegen erneut mit derselben karten_id und leerer punkte-Liste auf, bis adresse_offen 0 ist.
+4. Gib dem Nutzer die url aus der Antwort und fasse zusammen: Anzahl Punkte, davon mit Position, nicht gefunden (Namen nennen) und zu prüfen. Weise darauf hin, dass jeder mit dem Link die Karte sehen kann, und dass auf der Karte nach Typ und Merkmalen gefiltert und eine optimale Route berechnet werden kann.
+
+Behaupte nie, dass eine Karte angelegt oder Punkte gespeichert wurden, ohne erfolgreiche Werkzeugantwort. Nenne nur die url aus der Werkzeugantwort.

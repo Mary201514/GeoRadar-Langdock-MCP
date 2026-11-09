@@ -1,0 +1,97 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": "georadar-v2/dist",
+  "functions": {
+    "api/mcp.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,mcp/**,backend/**}",
+      "maxDuration": 60
+    },
+    "api/research.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,backend/**}",
+      "maxDuration": 30
+    },
+    "api/auth.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,backend/**}",
+      "maxDuration": 30
+    },
+    "api/views.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,backend/**}",
+      "maxDuration": 30
+    },
+    "api/karte.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,backend/**}",
+      "maxDuration": 30
+    },
+    "api/route.mjs": {
+      "includeFiles": "georadar-v2/{dist/**,backend/**}",
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/mcp",
+      "destination": "/api/mcp"
+    },
+    {
+      "source": "/mcp/",
+      "destination": "/api/mcp"
+    },
+    {
+      "source": "/k/:key([A-Za-z0-9_-]{22,64})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/:code([A-Za-z][A-Za-z0-9-]{2,31})",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:code([A-Za-z][A-Za-z0-9-]{2,31})",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/k/:key*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/plz/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    }
+  ],
+  "trailingSlash": false
+}

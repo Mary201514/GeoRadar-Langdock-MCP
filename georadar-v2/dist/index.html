@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Mangold GeoRadar: interaktive geografische Grundkarte für Deutschland und Österreich. Phase 1 mit echten OpenStreetMap-Vektordaten.">
+  <title>MANGOLD GEORADAR · Deutschland & Österreich</title>
+  <link rel="stylesheet" href="maplibre-gl.css"><link rel="stylesheet" href="style.css">
+  <script defer src="maplibre-gl.js"></script><script defer src="context-mask.js"></script><script defer src="postal-prefixes.js"></script><script defer src="representatives.js"></script><script defer src="data-model.js"></script><script defer src="xlsx.mini.min.js"></script><script defer src="company-import.js"></script><script defer src="analysis-model.js"></script><script defer src="view-model.js"></script><script defer src="companies.js"></script><script defer src="territories.js"></script><script defer src="analysis-ui.js"></script><script defer src="saved-views.js"></script><script defer src="mcp-bridge.js"></script><script defer src="saved-research.js"></script><script defer src="shared-map.js"></script><script defer src="plz-layer.js"></script><script defer src="attribute-filters.js"></script><script defer src="route-planner.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="https://www.mangoldgmbh.com" target="_blank" rel="noreferrer" aria-label="Mangold Unternehmenswebsite"><img src="mangold.svg" alt="Elektromaschinenbau Mangold" width="190" height="45"></a>
+    <div class="product"><span class="eyebrow">VERTRIEB GEOGRAFISCH DENKEN</span><h1>GEORADAR</h1></div>
+    <div class="header-meta"><span class="phase-tag">3.0 · PREVIEW</span><span>Firmenstandorte & Datenübergabe</span></div>
+    <button id="info" class="subtle">Daten & Hinweise <span aria-hidden="true">↗</span></button>
+  </header>
+  <nav class="toolbar" aria-label="Kartenwerkzeuge">
+    <button id="toggle-sidebar" class="icon-button" aria-label="Gebietsauswahl ein- oder ausblenden" aria-expanded="true">☰</button>
+    <span class="breadcrumb">Arbeitsbereich <span>/</span> <b id="area-name">Deutschland & Österreich</b></span>
+    <div class="toolbar-right"><button id="reset" class="subtle">↙ Gesamtansicht</button><button id="toggle-layers" class="outline" aria-expanded="true" aria-controls="layer-panel">Ebenen ▱</button><button id="export" class="outline">Ansicht exportieren ↓</button></div>
+  </nav>
+  <main class="workspace">
+    <aside class="sidebar" id="sidebar" aria-label="Gebiet und Suche">
+      <div class="section-heading"><span class="eyebrow">KARTENFOKUS</span><span class="number">01</span></div>
+      <h2>Ihr Markt. Im Blick.</h2><p class="muted intro">Zwei Länder. Eine gemeinsame geografische Perspektive.</p>
+      <label class="field-label" for="country">Gebiet auswählen</label>
+      <select id="country"><option value="both">Deutschland & Österreich</option><option value="de">Deutschland</option><option value="at">Österreich</option></select>
+      <div class="country-cards"><button class="country-card" data-area="de"><span class="country-code">DE</span><span>Deutschland<small>16 Bundesländer</small></span><span>↗</span></button><button class="country-card" data-area="at"><span class="country-code">AT</span><span>Österreich<small>9 Bundesländer</small></span><span>↗</span></button></div>
+      <div class="divider"></div>
+      <label class="field-label" for="search">Orte im Kartenausschnitt</label><div class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Sichtbaren Ort suchen …" autocomplete="off" maxlength="100"></div>
+      <p class="micro">Durchsucht geladene Ortsnamen. Für kleinere Orte zuerst näher heranzoomen.</p><div id="search-results" class="search-results" aria-live="polite"></div>
+      <div class="divider"></div>
+      <div class="section-heading"><h3>Unternehmensdaten</h3><span class="empty-count">0</span></div>
+      <div class="empty-state"><div class="empty-icon" aria-hidden="true">◎</div><b>Bereit für Ihre Standorte</b><p>Es sind noch keine Unternehmensdaten eingebunden. Excel-Import und Standortzuordnung folgen in Phase 4.</p></div>
+      <div class="legend"><span><i class="dot blue"></i>Bestandskunden</span><span><i class="dot white"></i>Potenzielle Neukunden</span><span><i class="dot red"></i>Besonders interessant</span><span><i class="dot gray"></i>Status ungeklärt</span></div>
+      <p class="micro">Verbindliche Statuslegende · Cluster sind neutral grau.</p><p id="bridge-state" class="micro" role="status"></p>
+      <div class="sidebar-foot"><span class="tiny-cross">✣</span><span>MANGOLD INTELLIGENCE<small>Geografie als Vertriebsgrundlage.</small></span></div>
+    </aside>
+    <section class="map-shell" aria-label="Interaktive Karte Deutschland und Österreich">
+      <div id="map" role="region" aria-label="Karte. Mit Maus oder Touch verschieben, mit Plus und Minus zoomen. Pfeiltasten verschieben die fokussierte Karte."></div>
+      <div class="map-heading"><span class="live-dot"></span><span>DEUTSCHLAND & ÖSTERREICH<small>Echte Geodaten · OpenStreetMap</small></span></div>
+      <div class="mode-switch"><span class="active">2D</span><button disabled title="Echtes DEM-Gelände folgt in Phase 2">3D <small>Phase 2</small></button></div>
+      <div id="load-state" class="load-state" role="status"><span class="spinner"></span> Kartendaten werden geladen …</div>
+      <div id="map-warning" class="map-warning" role="alert" hidden><span></span><button id="retry">Erneut laden</button></div>
+      <div class="map-bottom"><span>GEORADAR <b>3.0 · PREVIEW</b></span><span id="zoom-readout">ZOOM —</span></div>
+    </section>
+    <aside class="layers" id="layer-panel" aria-label="Ebenensteuerung">
+      <div class="section-heading"><span class="eyebrow">DARSTELLUNG</span><span aria-hidden="true">▱</span></div><h2>Kartenebenen</h2><p class="muted layer-intro">Die passende Detailtiefe für Ihren Blick auf die Region.</p>
+      <div id="layer-controls" class="layer-controls"><label><span>Staatsgrenzen<small>Kräftige Grenzlinien</small></span><input type="checkbox" data-group="countries" checked></label><label><span>Bundesländer<small>Administrative Ebene 4</small></span><input type="checkbox" data-group="states" checked></label><label><span>Kreise & Bezirke<small>Ab Zoomstufe 8 · nach Datenlage</small></span><input type="checkbox" data-group="districts"></label><label><span>Städte & Gemeinden<small>Zoomabhängige Ortsnamen</small></span><input type="checkbox" data-group="places" checked></label><label><span>Straßennetz<small>Autobahnen & Verkehrsachsen</small></span><input type="checkbox" data-group="roads" checked></label><label><span>Gewässer<small>Flüsse, Seen & Meere</small></span><input type="checkbox" data-group="water" checked></label></div>
+      <div class="divider"></div><div class="planned"><span class="eyebrow">NÄCHSTE AUSBAUSTUFEN</span><p>3D-Höhenrelief <span>02</span></p><p>PLZ-Daten & Regionen <span>03</span></p><p>Excel-Import <span>04</span></p><p>Kunden & Filter <span>05</span></p><p>White-Spot-Analyse <span>06</span></p><p>LeadRadar-Anbindung <span>07</span></p></div>
+      <div class="data-note"><b>Eine verlässliche Grundlage.</b><p>Grenzen und Orte stammen aus echten Kartendaten. Details erscheinen beim Heranzoomen. Keine amtliche Vermessungskarte.</p><button id="source-info" class="text-button">Datenquellen ansehen ↗</button></div>
+    </aside>
+  </main>
+  <footer class="statusbar"><span id="map-status" aria-live="polite">◌ Karte wird initialisiert</span><span id="coordinates">WGS 84 · EPSG:3857</span><span class="footer-phase" id="footer-data-count">0 Unternehmen</span></footer>
+  <dialog id="information"><div class="dialog-top"><h2>GeoRadar · Daten und Grenzen</h2><button id="close-info" class="icon-button" aria-label="Hinweise schließen">×</button></div><p>Die Preview 3.0 ergänzt Vertreterzuständigkeiten, auswählbare Auswertungen, Exporte und private benannte Ansichten. Die MCP-App empfängt weiterhin geprüfte Werkzeugergebnisse. Private Speicherung erfolgt nur nach Anmeldung und ausdrücklichem Speichern; keine automatische Zuordnung und kein automatisches Geocoding.</p><h3>Kartenquellen</h3><p>OpenFreeMap / OpenMapTiles, © OpenStreetMap-Mitwirkende (ODbL). Rendering MapLibre GL JS (BSD-3-Clause), angepasster Liberty-Stil. Vollständige Lizenzhinweise liegen im Paket. Grenzen sind zoomabhängig vereinfacht und nicht amtlich vermessen.</p><h3>Standortqualität</h3><p>Fehlende Koordinaten erzeugen keinen Marker. Ungefähre und ungeprüfte Positionen sind gekennzeichnet. Der eigene Mangold-Standort folgt der Kartenreferenz auf der Unternehmenswebsite und wird als ungefähr ausgewiesen.</p><h3>PLZ und Vertriebsgebiete</h3><p>PLZ-Präfixe filtern übergebene Unternehmen. Zuordnungen CO/SR/SH/GD/GK werden vom Benutzer festgelegt. Zweistellige PLZ-Präfixe ohne Firmenkoordinaten erscheinen als schematische Gebietspunkte nach GeoNames, ausdrücklich nicht als Firmenstandorte oder Gebietsgrenzen. Flächen werden ausschließlich aus importierten echten PLZ-Polygonen gezeichnet. Ohne Flächendaten gibt es nur eine Standortansicht. Die PLZ-Präfixsuche ist kein vollständiges PLZ-Verzeichnis.</p><h3>Betrieb und Langdock</h3><p>Die Karte benötigt WebGL, Worker und Internetzugriff auf tiles.openfreemap.org für Kacheln, Glyphen und Sprites. Der Anbieter erhält die angefragten Kartenressourcen und Ihre IP-Adresse. Unternehmensdaten werden nicht an den Kartenanbieter gesendet. Für Langdock liegt ein separater MCP-Server mit gebündelter Kartenressource vor. Der echte Workspace-Test und das HTTPS-Hosting dieses Servers stehen noch aus. 3D-DEM ist noch nicht enthalten. Tabellenimport unterstützt UTF-8-CSV/TSV und Excel .xlsx (erstes Tabellenblatt).</p><p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OSM-Lizenz</a> · <a href="https://openfreemap.org/" target="_blank" rel="noreferrer">OpenFreeMap</a> · <a href="https://www.mangoldgmbh.com/kontakt" target="_blank" rel="noreferrer">Mangold-Standortquelle</a></p></dialog>
+  <noscript><p class="noscript">Diese interaktive Karte benötigt JavaScript. Bitte aktivieren Sie JavaScript und laden Sie die Seite neu.</p></noscript>
+</body>
+</html>

@@ -5,11 +5,13 @@ function bundle(){
   let html=fs.readFileSync(path.join(dist,'index.html'),'utf8');
   for(const name of ['maplibre-gl.css','style.css'])html=html.replace('<link rel="stylesheet" href="'+name+'">',()=>'<style>'+fs.readFileSync(path.join(dist,name),'utf8').replace(/<\/style/gi,'<\\/style')+'</style>');
   const scripts=[];
-  for(const name of ['maplibre-gl.js','context-mask.js','postal-prefixes.js','representatives.js','data-model.js','xlsx.mini.min.js','company-import.js','analysis-model.js','view-model.js','companies.js','territories.js','analysis-ui.js','saved-views.js','mcp-bridge.js','saved-research.js','app.js']){
+  for(const name of ['maplibre-gl.js','context-mask.js','postal-prefixes.js','representatives.js','data-model.js','xlsx.mini.min.js','company-import.js','analysis-model.js','view-model.js','companies.js','territories.js','analysis-ui.js','saved-views.js','mcp-bridge.js','saved-research.js','attribute-filters.js','app.js']){
     html=html.replace('<script defer src="'+name+'"></script>','');
     const source=name==='mcp-bridge.js'?path.join(__dirname,'app-bridge.js'):path.join(dist,name);
     scripts.push('<script>'+fs.readFileSync(source,'utf8').replace(/<\/script/gi,'<\\/script')+'</script>');
   }
+  html=html.replace('<base href="/">','');
+  for(const name of ['shared-map.js','plz-layer.js','route-planner.js'])html=html.replace('<script defer src="'+name+'"></script>','');
   html=html.replace('src="mangold.svg"','src="data:image/svg+xml;base64,'+fs.readFileSync(path.join(dist,'mangold.svg')).toString('base64')+'"');
   const style='<script>window.GEORADAR_STYLE='+JSON.stringify(JSON.parse(fs.readFileSync(path.join(dist,'base-style.json'),'utf8'))).replace(/</g,'\\u003c')+';</script>';
   return html.replace('</body>',()=>style+scripts.join('\n')+'</body>');

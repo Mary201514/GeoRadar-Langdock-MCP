@@ -1,6 +1,6 @@
 'use strict';
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
-let playwright;try{playwright=require('playwright');}catch{playwright=require(path.join(require('node:os').homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));}const {chromium}=playwright;
+let playwright;try{playwright=require('playwright');}catch{playwright=(()=>{for(const p of ['playwright','/opt/npm-tools/node_modules/playwright',path.join(require('node:os').homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')]){try{return require(p);}catch{}}throw Error('Playwright nicht gefunden');})();}const {chromium}=playwright;
 const {handle,URI}=require('./server.cjs');
 const records=process.argv[2]==='prefix'?[{id:'DUMMY-DE-88',name:'Fiktive Präfix-Testfirma DE',country:'DE',postalCode:'88',status:'existing'},{id:'DUMMY-AT-10',name:'Fiktive Präfix-Testfirma AT',country:'AT',postalPrefix:'10',status:'priority'}]:[['DE',9.99,53.55],['DE',13.405,52.52],['AT',16.373,48.208],['AT',11.404,47.269]].map(([country,lon,lat],i)=>({id:'DUMMY-'+i,name:'Fiktive Testfirma '+i,country,lon,lat,locationAccuracy:'approximate',status:['existing','prospect','priority','unknown'][i]}));
 async function main(){

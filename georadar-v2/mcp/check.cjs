@@ -13,7 +13,7 @@ async function main(){
   for(const row of [{...base,lat:null},{...base,lon:'13.4'},{...base,lon:0},{...base,status:'green'},{...base,postalCode:10115},{...base,country:'FR'},{...base,leadScore:101},{...base,locationAccuracy:'verified-by-ai'}])assert.throws(()=>D.validate({records:[row]}));
   assert.throws(()=>D.validate({records:[base,base]}));assert.throws(()=>D.validate({records:Array(10001).fill(base)}));
   const large=D.validate({records:Array.from({length:10000},(_,i)=>({...base,id:String(i)}))});assert.equal(large.records.length,10000);
-  assert.equal(call('initialize',{protocolVersion:'2025-03-26'}).serverInfo.version,'2.0.0');
+  assert.equal(call('initialize',{protocolVersion:'2025-03-26'}).serverInfo.version,'4.0.0');
   assert.equal(call('tools/list').tools[0].name,'show_georadar_map');
   const data=call('tools/call',{name:'show_georadar_map',arguments:{records:[{...base,status:'priority'}]}});assert.equal(data.structuredContent.summary.priority,1);
   assert.equal(call('tools/call',{name:'show_georadar_map',arguments:{records:[{}]}}).isError,true);

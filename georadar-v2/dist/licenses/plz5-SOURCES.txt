@@ -1,4 +1,4 @@
-PLZ-Gebiete Deutschland (5-stellig) – plz/plz5.geojson, plz/plz5-labels.geojson
+PLZ-Gebiete Deutschland (5-stellig) – plz/plz5-nord.geojson + plz/plz5-sued.geojson (PLZ 0–4 / 5–9), plz/plz5-labels.geojson
 
 Quelle: OpenStreetMap-Grenzen boundary=postal_code, aufbereitet von yetzt/postleitzahlen,
 Release 2026.02 (https://github.com/yetzt/postleitzahlen/releases/tag/2026.02).

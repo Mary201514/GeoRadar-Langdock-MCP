@@ -58,13 +58,25 @@ function createKunden({fetchImpl=(...a)=>fetch(...a),getConfig=supabaseConfig,ge
       const n=Math.min(Math.max(Number.isInteger(anzahl)?anzahl:15,1),100);
       let semantisch=[],hinweis;
       try{const [v]=await embed([suchtext.trim()]);semantisch=await rpc('georadar_kunden_suche',{abfrage:vec(v),anzahl:n,mit_fiktiven:mit_fiktiven===true});}
-      catch(e){if(!(e instanceof KundenError)||!/^EMBEDDINGS_/.test(e.code))throw e;hinweis=e.message+' Es wurde nur die Volltextsuche verwendet.';}
+      catch(e){if(!(e instanceof KundenError)||!/^EMBEDDINGS_/.test(e.code))throw e;hinweis=e.message+' Es wurde nur die Volltextsuche verwendet (Wortstämme, keine Bedeutung): für Bedeutungssuche mehrere Suchen mit Synonymen, Namensteilen und Orten durchführen.';}
       const volltext=await rpc('georadar_kunden_volltext',{suchtext:suchtext.trim(),anzahl:n,mit_fiktiven:mit_fiktiven===true}).catch(()=>[]);
-      if(!semantisch.length&&!hinweis)hinweis='Noch keine Embeddings vorhanden – Ergebnis nur aus der Volltextsuche. Bitte kunden_embeddings_aktualisieren ausführen.';
+      // Volltext verknüpft Wörter mit UND. Reicht das nicht, zusätzlich jedes Wort einzeln (ODER) – Treffer mit allen Wörtern bleiben vorn.
+      const woerter=suchtext.trim().replace(/["()]/g,' ').split(/\s+/).filter(w=>w.length>1&&!/^(or|oder|und|and|in|im|am|an|bei|der|die|das|von|für|gmbh|ag|kg|co|mbh)$/i.test(w));
+      if(volltext.length<n&&woerter.length>1){
+        const breit=await rpc('georadar_kunden_volltext',{suchtext:woerter.join(' or '),anzahl:n,mit_fiktiven:mit_fiktiven===true}).catch(()=>[]);
+        for(const r of breit)if(!volltext.some(v=>v.id===r.id))volltext.push({...r,teiltreffer:true});
+      }
+      if(!semantisch.length&&!hinweis)hinweis='Embeddings sind noch nicht eingerichtet – Ergebnis nur aus der Volltextsuche (Wortstämme, keine Bedeutung). Für Bedeutungssuche mehrere Suchen mit Synonymen, Namensteilen und Orten durchführen.';
       const seen=new Set(),treffer=[];
       for(const r of semantisch){seen.add(r.id);treffer.push({...r,aehnlichkeit:Math.round(r.aehnlichkeit*1000)/1000,quelle:'semantisch'+(volltext.some(v=>v.id===r.id)?' + Volltext':'')});}
-      for(const r of volltext)if(!seen.has(r.id)&&treffer.length<n+5){treffer.push({...r,rang:undefined,aehnlichkeit:null,quelle:'Volltext'});seen.add(r.id);}
-      return {suchtext:suchtext.trim(),anzahl:treffer.length,treffer,hinweis};
+      for(const r of volltext)if(!seen.has(r.id)&&treffer.length<n+5){treffer.push({...r,rang:undefined,teiltreffer:undefined,aehnlichkeit:null,quelle:r.teiltreffer?'Volltext (einzelne Begriffe)':'Volltext'});seen.add(r.id);}
+      // Gespeicherte (ungefähre) Positionen mitliefern, damit Karten ohne erneute Adresssuche entstehen.
+      if(treffer.length){try{
+        const pos=await rest('georadar_kunden?'+new URLSearchParams({select:'id,lon,lat',id:'in.('+treffer.map(t=>'"'+String(t.id).replace(/["\\]/g,'')+'"').join(',')+')'}));
+        const byId=new Map((pos||[]).map(p=>[p.id,p]));
+        for(const t of treffer){const p=byId.get(t.id);if(p&&Number.isFinite(p.lon)&&Number.isFinite(p.lat)){t.lon=p.lon;t.lat=p.lat;}}
+      }catch{}}
+      return {suchtext:suchtext.trim(),anzahl:treffer.length,treffer,positionen:'lon/lat sind ungefähre Positionen (PLZ-Gebiet bzw. Ortsmitte), locationAccuracy approximate',hinweis};
     },
     async embeddingsAktualisieren({budgetMs=40000,batch=96}={}){
       const start=Date.now();let geschrieben=0,runden=0;

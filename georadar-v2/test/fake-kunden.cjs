@@ -14,12 +14,13 @@ function fakeKundenSupabase(records){
   async function fetchImpl(url,options={}){
     const u=new URL(url),path=u.pathname.replace('/rest/v1/','');calls.push(path);
     if(!options.headers?.apikey)return json({message:'no key'},401);
+    if(path==='georadar_kunden'&&u.searchParams.get('id')){const ids=u.searchParams.get('id').replace(/^in\.\(|\)$/g,'').split(',').map(x=>x.replace(/^"|"$/g,''));return json(rows.filter(r=>ids.includes(r.id)).map(r=>({id:r.id,lon:r.record.lon??null,lat:r.record.lat??null})));}
     if(path==='georadar_kunden'){const o=Number(u.searchParams.get('offset')||0),l=Number(u.searchParams.get('limit')||1000);return json(rows.slice(o,o+l).map(r=>({record:r.record})));}
     const a=options.body?JSON.parse(options.body):{};
     if(path==='rpc/georadar_kunden_ohne_embedding')return json(rows.filter(r=>!r.embedding||r.hash!==md5(r.such_text)).slice(0,a.anzahl).map(r=>({id:r.id,such_text:r.such_text,hash:md5(r.such_text)})));
     if(path==='rpc/georadar_kunden_embeddings_setzen'){let n=0;for(const e of a.daten){const r=rows.find(x=>x.id===e.id);if(r&&md5(r.such_text)===e.hash){r.embedding=e.embedding;r.hash=e.hash;n++;}}return json(n);}
     if(path==='rpc/georadar_kunden_suche'){const v=JSON.parse(a.abfrage);return json(rows.filter(r=>r.embedding&&(a.mit_fiktiven||!r.ist_fiktiv)).map(r=>({...pub(r),aehnlichkeit:cos(v,r.embedding)})).sort((x,y)=>y.aehnlichkeit-x.aehnlichkeit).slice(0,a.anzahl));}
-    if(path==='rpc/georadar_kunden_volltext'){const w=a.suchtext.toLowerCase().split(/\s+/);return json(rows.filter(r=>(a.mit_fiktiven||!r.ist_fiktiv)&&w.every(t=>r.such_text.toLowerCase().includes(t))).slice(0,a.anzahl).map(r=>({...pub(r),rang:0.1})));}
+    if(path==='rpc/georadar_kunden_volltext'){const alt=a.suchtext.toLowerCase().split(/\s+or\s+/).map(x=>x.split(/\s+/));return json(rows.filter(r=>(a.mit_fiktiven||!r.ist_fiktiv)&&alt.some(w=>w.every(t=>r.such_text.toLowerCase().includes(t)))).slice(0,a.anzahl).map(r=>({...pub(r),rang:0.1})));}
     return json({code:'PGRST205'},404);
   }
   return {fetchImpl,rows,calls,getConfig:()=>({url:'https://kunden-test.supabase.co',key:'sb_secret_'+'k'.repeat(40)})};

@@ -8,7 +8,7 @@ const {createKundenApi}=require('./backend/kunden-api.cjs'),{createKunden}=requi
 const root=path.resolve(__dirname,'dist');
 const mime={'.geojson':'application/geo+json','.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.txt':'text/plain; charset=utf-8'};
 function createPreviewServer({store=createStore(),getToken=()=>process.env.GEORADAR_TOKEN,web=createPrivateViews(),maps=null,mapsService,kunden}={}){
- const api=createResearchApi({store,getToken}),mcp=createTransport({getToken,dispatch:m=>handle(m,{store,...(mapsService?{mapsService}:{}),...(kunden?{kunden}:{})})}),mapsApi=maps||createMapsApi(mapsService?{service:mapsService}:{}),kundenGet=createKundenApi({views:web,kunden:kunden||createKunden()});
+ const api=createResearchApi({store,getToken,views:web}),mcp=createTransport({getToken,dispatch:m=>handle(m,{store,...(mapsService?{mapsService}:{}),...(kunden?{kunden}:{})})}),mapsApi=maps||createMapsApi(mapsService?{service:mapsService}:{}),kundenGet=createKundenApi({views:web,kunden:kunden||createKunden()});
  return http.createServer(async(req,res)=>{
   let pathname,url;try{url=new URL(req.url,'http://'+req.headers.host);pathname=decodeURIComponent(url.pathname);}catch{res.writeHead(400).end();return;}
   if(['/api/research','/mcp','/api/auth','/api/views','/api/karte','/api/route','/api/kunden'].includes(pathname)){

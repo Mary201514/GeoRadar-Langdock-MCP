@@ -1,5 +1,6 @@
 import api from '../backend/research-api.cjs';
-const handle=api.createResearchApi();
+import web from '../backend/private-views.cjs';
+const handle=api.createResearchApi({views:web.createPrivateViews()});
 export const GET=handle;
 export const POST=handle;
 export const PUT=handle;

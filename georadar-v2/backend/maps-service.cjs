@@ -9,10 +9,10 @@ const MAX_POINTS_PER_CALL=500;
 const COORD_SOURCE='Adresssuche Google Maps (SerpApi)';
 
 function applyPostalCode(r){
-  if(r.country!=='Deutschland'||!Number.isFinite(r.lon))return r;
+  if(!/^(DE|Deutschland)$/i.test(String(r.country||''))||!Number.isFinite(r.lon))return r;
   const found=plz.postalCodeAt(r.lon,r.lat);
   if(!found)return r;
-  if(!r.postalCode||r.postalCode.length===2){r.postalCode=found;delete r.postalPrefix;r.geocodeNote=[r.geocodeNote,'PLZ aus Position ermittelt'].filter(Boolean).join(' · ');}
+  if(!r.postalCode||String(r.postalCode).length===2){r.postalCode=found;delete r.postalPrefix;r.geocodeNote=[r.geocodeNote,'PLZ aus Position ermittelt'].filter(Boolean).join(' · ');}
   else if(r.postalCode!==found){r.needsReview=true;r.geocodeNote=[r.geocodeNote,'Position liegt im PLZ-Gebiet '+found+', angegeben ist '+r.postalCode].filter(Boolean).join(' · ');}
   return r;
 }
@@ -52,6 +52,52 @@ function createMapsService({store=createMapsStore(),geocoder=createGeocoder(),no
     await store.upsertPoints(map.mapId,updates);
     const remaining=queue.reduce((n,g)=>n+g.length,0);
     return {processed:updates.length,remaining,error:stop?{code:stop instanceof GeocodeError?stop.code:'GEOCODING_FAILED',message:stop.message}:null};
+  }
+
+  // Ergänzt fehlende Positionen in beliebigen Datensätzen (z. B. vor save_georadar_research). Cache wie bei geteilten Karten.
+  async function enrichRecords(records,{budgetMs=30000,concurrency=6}={}){
+    const stat={gesucht:0,gefunden:0,nicht_gefunden:0,offen:0,ohne_adresse:0,hinweis:undefined};
+    if(!Array.isArray(records))return stat;
+    const todo=[];
+    for(const r of records){
+      if(!r||typeof r!=='object'||Array.isArray(r))continue;
+      const hasPos=r.lon!=null&&r.lat!=null&&Number.isFinite(Number(r.lon))&&Number.isFinite(Number(r.lat));
+      if(hasPos)continue;
+      const query=addressQuery(r);
+      if(!query){stat.ohne_adresse++;continue;}
+      todo.push({r,query,hash:queryHash(query)});
+    }
+    if(!todo.length)return stat;
+    if(!geocoder.configured()){stat.offen=todo.length;stat.hinweis='SERPAPI_KEY fehlt; Positionen wurden nicht gesucht.';return stat;}
+    const started=now();
+    let cache=new Map();try{cache=await store.cacheGet([...new Set(todo.map(t=>t.hash))]);}catch{}
+    const apply=(t,res)=>{
+      const r=t.r;
+      if(res.status==='ok'){
+        r.lon=res.lon;r.lat=res.lat;r.locationAccuracy='approximate';r.coordinateSource=COORD_SOURCE;
+        if(res.ambiguous){r.needsReview=true;r.notes=[r.notes,'Standort: mehrere Treffer der Adresssuche, erster übernommen'].filter(Boolean).join(' · ').slice(0,2000);}
+        applyPostalCode(r);
+        if(r.geocodeNote){r.notes=[r.notes,'Standort: '+r.geocodeNote].filter(Boolean).join(' · ').slice(0,2000);delete r.geocodeNote;}
+        stat.gefunden++;
+      }else stat.nicht_gefunden++;
+    };
+    const groups=new Map();
+    for(const t of todo){const hit=cache.get(t.hash);if(hit){apply(t,hit);continue;}if(!groups.has(t.hash))groups.set(t.hash,[]);groups.get(t.hash).push(t);}
+    const queue=[...groups.values()],cacheRows=[];let stop=null;
+    async function worker(){
+      while(queue.length&&!stop){
+        if(now()-started>budgetMs)return;
+        const group=queue.shift(),t=group[0];stat.gesucht++;
+        try{const res=await geocoder.lookup(t.query,{country:/^(AT|Österreich)$/i.test(String(t.r.country))?'Österreich':'Deutschland'});cacheRows.push({query_hash:t.hash,query:t.query.slice(0,1000),status:res.status,lon:res.lon??null,lat:res.lat??null,formatted_address:res.formatted_address??null,source:'serpapi:google_maps'});for(const g of group)apply(g,res);}
+        catch(e){stop=e;queue.unshift(group);stat.gesucht--;}
+      }
+    }
+    await Promise.all(Array.from({length:concurrency},worker));
+    try{await store.cachePut(cacheRows);}catch{}
+    stat.offen=queue.reduce((n,g)=>n+g.length,0);
+    if(stop)stat.hinweis='Adresssuche: '+stop.message;
+    else if(stat.offen)stat.hinweis='Zeitbudget erreicht; '+stat.offen+' Positionen nicht gesucht.';
+    return stat;
   }
 
   async function summary(map){
@@ -104,7 +150,8 @@ function createMapsService({store=createMapsStore(),geocoder=createGeocoder(),no
       return {titel:map.title,beschreibung:map.description,aktualisiert:map.updatedAt,records:rows.map(r=>r.record),offen:rows.filter(r=>r.geocode_status==='pending').length};
     },
     async pointsByKey(key){const map=await store.getMapByKey(key);return (await store.listPoints(map.mapId)).map(r=>r.record);},
-    geocodePending
+    geocodePending,
+    enrichRecords
   };
 }
 

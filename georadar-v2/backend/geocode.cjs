@@ -5,10 +5,11 @@ const crypto=require('node:crypto');
 class GeocodeError extends Error{constructor(code,message){super(message);this.code=code;}}
 
 function addressQuery(r){
-  const country=r.country==='Österreich'?'Österreich':'Deutschland';
+  const country=/^(AT|Österreich|Oesterreich|Austria)$/i.test(String(r.country||''))?'Österreich':'Deutschland';
   if(r.address)return /deutschland|germany|österreich|austria/i.test(r.address)?r.address:r.address+', '+country;
-  const line=[r.street,[r.postalCode&&r.postalCode.length>=4?r.postalCode:'',r.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
-  if(!line||(!r.street&&!(r.postalCode&&r.postalCode.length>=4)&&!r.city))return null;
+  const plz=r.postalCode!=null?String(r.postalCode).trim():'';
+  const line=[r.street,[plz.length>=4?plz:'',r.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  if(!line||(!r.street&&!(plz.length>=4)&&!r.city))return null;
   // Ohne Straße: Firmenname hilft Google, den Standort zu finden.
   return (r.street?'':r.name+', ')+line+', '+country;
 }

@@ -1,6 +1,6 @@
 'use strict';
 const crypto=require('node:crypto'),{createStore,ResearchError}=require('./research-store.cjs');
-function createResearchApi({store=createStore(),getToken=()=>process.env.GEORADAR_TOKEN}={}){
+function createResearchApi({store=createStore(),getToken=()=>process.env.GEORADAR_TOKEN,views=null}={}){
  return async request=>{
   const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow','Referrer-Policy':'no-referrer'};
   const json=(status,body,extra={})=>new Response(JSON.stringify(body),{status,headers:{...headers,...extra}});
@@ -13,7 +13,19 @@ function createResearchApi({store=createStore(),getToken=()=>process.env.GEORADA
   }
   const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin&&origin!==process.env.ALLOWED_ORIGIN)return json(403,{error:'ORIGIN_NOT_ALLOWED'});
   try{
-   if(request.method==='GET'){const code=new URL(request.url).searchParams.get('code'),result=await store.load(code);if(result.publiclyReadable!==true)return json(404,{error:'NOT_FOUND',message:'Keine öffentlich freigegebene Dummy-Recherche für diese Kennung vorhanden.'});return json(200,result);}
+   if(request.method==='GET'){
+    const code=new URL(request.url).searchParams.get('code');
+    // Ohne Anmeldeweg (views): wie bisher nur fiktive Dummy-Läufe. Mit Anmeldeweg: echte Recherchen für angemeldete Nutzer.
+    if(!views){const result=await store.load(code);if(result.publiclyReadable!==true)return json(404,{error:'NOT_FOUND',message:'Keine öffentlich freigegebene Dummy-Recherche für diese Kennung vorhanden.'});return json(200,result);}
+    let result=null,missing=false;
+    try{result=await store.load(code);}catch(e){if(e instanceof ResearchError&&e.status===404)missing=true;else throw e;}
+    if(result?.publiclyReadable===true)return json(200,result);
+    let signedIn=false;try{await views.user(request);signedIn=true;}catch{}
+    // Nicht angemeldet: unbekannte und geschützte Kennungen gleich beantworten (verrät nicht, ob eine Kennung existiert).
+    if(!signedIn)return json(401,{error:'LOGIN_REQUIRED',message:'Diese Recherche ist nach der Anmeldung sichtbar.'});
+    if(missing)return json(404,{error:'NOT_FOUND',message:'Keine Recherche unter dieser Kennung.'});
+    return json(200,{...result,loginRequired:true});
+   }
    if(!/^application\/json(?:\s*;|\s*$)/i.test(request.headers.get('content-type')||''))return json(415,{error:'CONTENT_TYPE_REQUIRED'});
    if(Number(request.headers.get('content-length'))>2*1024*1024)return json(413,{error:'PAYLOAD_TOO_LARGE'});
    const chunks=[];let size=0;const reader=request.body?.getReader();if(reader){try{while(true){const p=await reader.read();if(p.done)break;size+=p.value.byteLength;if(size>2*1024*1024){await reader.cancel();return json(413,{error:'PAYLOAD_TOO_LARGE'});}chunks.push(Buffer.from(p.value));}}finally{reader.releaseLock();}}

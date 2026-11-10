@@ -50,6 +50,13 @@ async function test(name,fn){try{await fn();results.push('✓ '+name);}catch(e){
     await assert.rejects(kunden.embeddingsAktualisieren(),e=>e.code==='EMBEDDINGS_NOT_CONFIGURED');
   });
 
+  await test('Volltext ohne Treffer für alle Wörter: einzelne Begriffe als Teiltreffer',async()=>{
+    const {kunden}=setup({langdockKey:''});const r=await kunden.suchen({suchtext:'Ulm Gibtsnichtwort GmbH'});
+    assert.ok(r.anzahl>0);assert.ok(r.treffer.every(t=>t.quelle==='Volltext (einzelne Begriffe)'&&t.teiltreffer===undefined));
+    assert.match(r.hinweis,/Synonymen/);
+    const mitPos=r.treffer.filter(t=>Number.isFinite(t.lon));assert.ok(mitPos.length>0);assert.ok(mitPos.every(t=>t.lon>=5&&t.lon<=18&&t.lat>=46&&t.lat<=56));
+  });
+
   await test('Langdock-Fehler: 401, Rate-Limit, falsche Dimension',async()=>{
     await assert.rejects(setup({status:401}).kunden.embeddingsAktualisieren(),e=>e.code==='EMBEDDINGS_NOT_CONFIGURED');
     await assert.rejects(setup({status:429}).kunden.embeddingsAktualisieren(),e=>e.code==='EMBEDDINGS_RATE_LIMIT');

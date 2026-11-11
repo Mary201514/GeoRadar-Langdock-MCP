@@ -35,3 +35,6 @@
 .maplibregl-popup-content .outline{margin-top:8px}
 .customer-notice{display:grid;gap:6px;margin-top:6px}
 .customer-notice button{justify-self:start}
+
+/* Bright yellow prospect status; representative rings remain unchanged. */
+.dot.prospect{background:#FFEA00;border-color:#d4b600;box-shadow:0 0 5px #ffea0059}

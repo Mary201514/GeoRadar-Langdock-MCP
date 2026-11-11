@@ -89,3 +89,8 @@ Offen bleiben die vom Benutzer angekündigte Preview-Secret-/Benutzerkonto-Einri
 - `test/check-private-views.cjs`, `fake-private-storage.cjs`, `check-v3-browser.cjs`: neue Tests.
 
 Dokumentation: https://supabase.com/docs/guides/auth/passwords und https://supabase.com/docs/guides/auth/server-side/advanced-guide.
+
+
+## Statusfarbe vom 11.11.2026
+
+Auf Benutzerwunsch erscheinen potenzielle Neukunden (prospect) mit leuchtend gelber Füllung #FFEA00 statt Weiß. Legende, Kennzahlen, Karten-/PDF-/PNG-Darstellung und aktuelle Werkzeug-/Agentbeschreibungen verwenden die neue Farbe. Vertreterringe behalten ihre Farben (GK #EAB308), ebenso Bestandskunden blau, priorisierte Leads rot und ungeklärte Firmen grau. Änderung ausschließlich im Preview-Branch; keine Produktivfreigabe.

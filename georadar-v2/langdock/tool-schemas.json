@@ -2,7 +2,7 @@
   {
     "name": "show_georadar_map",
     "title": "Mangold GeoRadar – Firmen auf Karte anzeigen",
-    "description": "Zeigt übergebene Unternehmen auf der echten MapLibre-Karte für Deutschland und Österreich. Status existing=blau/Bestandskunde, prospect=weiß/potenziell, priority=rot/besonders interessant, unknown=grau/ungeklärt. Jede Übergabe ersetzt den gesamten Bestand. Nur belegte Koordinaten übergeben; ohne Koordinaten wird ein zweistelliges postalPrefix oder eine zweistellige postalCode als schematischer PLZ-Gebietspunkt nach GeoNames angezeigt, ausdrücklich kein Firmenstandort. Ohne passende Referenz bleibt die Firma in der Liste. locationAccuracy exact nur bei geprüftem Firmenstandort, sonst approximate oder unknown. Kein automatisches Geocoding und keine erfundenen Marktpotenziale. Alte category Bestandskunde/Neukunde wird unterstützt.",
+    "description": "Zeigt übergebene Unternehmen auf der echten MapLibre-Karte für Deutschland und Österreich. Status existing=blau/Bestandskunde, prospect=leuchtend gelb/potenziell, priority=rot/besonders interessant, unknown=grau/ungeklärt. Jede Übergabe ersetzt den gesamten Bestand. Nur belegte Koordinaten übergeben; ohne Koordinaten wird ein zweistelliges postalPrefix oder eine zweistellige postalCode als schematischer PLZ-Gebietspunkt nach GeoNames angezeigt, ausdrücklich kein Firmenstandort. Ohne passende Referenz bleibt die Firma in der Liste. locationAccuracy exact nur bei geprüftem Firmenstandort, sonst approximate oder unknown. Kein automatisches Geocoding und keine erfundenen Marktpotenziale. Alte category Bestandskunde/Neukunde wird unterstützt.",
     "inputSchema": {
       "type": "object",
       "required": [

@@ -1,6 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),R=require('../dist/representatives.js'),D=require('../dist/data-model.js'),I=require('../dist/company-import.js'),{handle}=require('../mcp/server.cjs');
 const configs=R.definitions.map(d=>({code:d.code,personnelNumber:d.personnelNumber,rules:[]}));
+assert.equal(D.statuses.prospect.color,'#FFEA00');assert.equal(D.statuses.existing.color,'#2387ec');assert.equal(D.statuses.priority.color,'#e0444e');assert.equal(D.statuses.unknown.color,'#788592');
 const colors=['#16A34A','#F97316','#7C3AED','#0D9488','#EAB308'];
 assert.deepEqual(R.definitions.map(d=>d.color),colors);assert.equal(D.validateTerritories(configs).length,5);
 for(const d of R.definitions)for(const value of [d.code,d.personnelNumber,d.code+' '+d.personnelNumber,d.code+' · '+d.personnelNumber,d.code.toLowerCase()+' '+d.personnelNumber])assert.equal(R.resolve(value)?.code,d.code);
